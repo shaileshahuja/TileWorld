@@ -110,6 +110,7 @@ public class TWAgentWorkingMemory {
         assert (sensedObjects.size() == objectXCoords.size() && sensedObjects.size() == objectYCoords.size());
 
 //        me.getEnvironment().getMemoryGrid().clear();  // THis is equivalent to only having sensed area in memory
+        memoryGrid.clear(); //delete everything 
 //       this.decayMemory();       // You might want to think about when to call the decay function as well.
         for (int i = 0; i < sensedObjects.size(); i++) {
             TWEntity o = (TWEntity) sensedObjects.get(i);

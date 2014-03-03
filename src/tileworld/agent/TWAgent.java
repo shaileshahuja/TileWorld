@@ -122,6 +122,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         //below is not strictly necessary as the location will be overwritten with agent
         //but for clarity include this here.
         this.getEnvironment().getObjectGrid().set(tile.getX(), tile.getY(), null);
+        System.out.println("Tile picked at " + x + " " + y);
     }
 
     /**
@@ -135,7 +136,8 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         this.carriedTiles.remove(0); //remove first tile in list
         this.getEnvironment().getObjectGrid().set(hole.getX(), hole.getY(), null);
         this.score++;
-
+        System.out.println("Tile put at " + x + " " + y);
+		System.out.println("Score: " + this.score);
     }
 
     /**

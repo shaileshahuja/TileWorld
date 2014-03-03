@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="libs/MASON_14.jar" sourcepath="libs/src/MASON_src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Shailesh/Desktop/Courses/CSC416/Assignment/TileWorld/libs/docs/MASON_14_docs.zip!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/MasonTileworld_CSC416.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -217,6 +217,10 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         return carriedTiles.size() > 0;
     }
 
+    public int numberOfCarriedTiles()
+    {
+    	return carriedTiles.size();
+    }
     /**
      * Returns the working memory of this agent
      * @return working memory

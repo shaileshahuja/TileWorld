@@ -3,8 +3,6 @@
  */
 package tileworld.environment;
 
-import java.util.ArrayList;
-import java.util.List;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.ObjectGrid2D;

@@ -5,8 +5,12 @@
 
 package tileworld.agent;
 
+import java.util.HashMap;
+
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
+import practicalreasoning.Intention;
+import practicalreasoning.Utility;
 import tileworld.environment.TWDirection;
 import tileworld.environment.TWEntity;
 import tileworld.environment.TWEnvironment;
@@ -27,7 +31,7 @@ import tileworld.exceptions.CellBlockedException;
  *
  */
 public class SimpleTWAgent extends TWAgent{
-
+	public static double exploreThreshold = 10;
 	public SimpleTWAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel) {
 		super(xpos,ypos,env,fuelLevel);
 	}
@@ -35,6 +39,9 @@ public class SimpleTWAgent extends TWAgent{
 	protected TWThought think() {
 		//        getMemory().getClosestObjectInSensorRange(Tile.class);
 //		System.out.println("Simple Score: " + this.score);
+		HashMap<Intention, Double> utilities = options();
+		Intention intention = filter(utilities);
+		
 		TWEntity current = (TWEntity) getMemory().getMemoryGrid().get(x,  y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
 			return new TWThought(TWAction.PICKUP, null);
@@ -42,6 +49,32 @@ public class SimpleTWAgent extends TWAgent{
 			return new TWThought(TWAction.PUTDOWN, null);
 		else
 			return new TWThought(TWAction.MOVE,getRandomDirection());
+	}
+
+	private Intention filter(HashMap<Intention, Double> utilities) {
+		boolean explore = true;
+		for(Double value: utilities.values())
+		{
+			if(value > exploreThreshold)
+				explore = false;
+		}
+		if (explore)
+			return Intention.EXPLORE;
+		
+		if(utilities.get(Intention.REFUEL) >= utilities.get(Intention.PICKUPTILE) && 
+				utilities.get(Intention.REFUEL) >= utilities.get(Intention.FILLHOLE))
+			return Intention.REFUEL;
+		if(utilities.get(Intention.PICKUPTILE) > utilities.get(Intention.FILLHOLE))
+			return Intention.PICKUPTILE;
+		return Intention.FILLHOLE;
+	}
+
+	private HashMap<Intention, Double> options() {
+		HashMap<Intention, Double> utilities = new HashMap<Intention, Double>();
+		utilities.put(Intention.REFUEL, Utility.fueling(this, getEnvironment()));
+		utilities.put(Intention.PICKUPTILE, Utility.pickUpTile(this, getEnvironment()));
+		utilities.put(Intention.FILLHOLE, Utility.putInHole(this, getEnvironment()));
+		return utilities;
 	}
 
 	@Override

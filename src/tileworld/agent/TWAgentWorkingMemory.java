@@ -1,19 +1,16 @@
 package tileworld.agent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.text.html.HTMLDocument;
+
 import sim.engine.Schedule;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.IntBag;
-import tileworld.environment.NeighbourSpiral;
 import tileworld.Parameters;
+import tileworld.environment.NeighbourSpiral;
 import tileworld.environment.TWEntity;
-
-
 import tileworld.environment.TWHole;
 import tileworld.environment.TWObject;
 import tileworld.environment.TWObstacle;
@@ -59,7 +56,7 @@ public class TWAgentWorkingMemory {
     private TWAgentPercept[][] objects;
     /**
      * Number of items recorded in memory, currently doesn't decrease as memory
-     * is not degraded - nothing is every removed!
+     * is not degraded - nothing is ever removed!
      */
     private int memorySize;
 

@@ -204,7 +204,7 @@ public class TWGUI extends GUIState {
      */
     public void addMemoryPortrayal(TWAgent agent) {
         ObjectGridPortrayal2D memoryPortrayal = new ObjectGridPortrayal2D();
-        memoryPortrayal.setField(agent.getMemory().getMemoryGrid());
+        memoryPortrayal.setField(agent.getMemory().getObjects());
         memoryPortrayal.setPortrayalForClass(TWHole.class, TWHole.getMemoryPortrayal());
         memoryPortrayal.setPortrayalForClass(TWTile.class, TWTile.getPortrayal());
         memoryPortrayal.setPortrayalForClass(TWObstacle.class, TWObstacle.getPortrayal());

@@ -45,8 +45,6 @@ public class TWAgentWorkingMemory {
     private final static int MAX_TIME = 10;
     private final static float MEM_DECAY = 0.5f;
     
-     private ObjectGrid2D memoryGrid;
-    
     /*
      * This was originally a queue ordered by the time at which the fact was observed.
      * However, when updating the memory a queue is very slow.
@@ -76,7 +74,7 @@ public class TWAgentWorkingMemory {
         this.objects = new TWAgentPercept[x][y];
 
         this.schedule = schedule;
-        this.memoryGrid = new ObjectGrid2D(me.getEnvironment().getxDimension(), me.getEnvironment().getyDimension());
+//        this.memoryGrid = new ObjectGrid2D(me.getEnvironment().getxDimension(), me.getEnvironment().getyDimension());
     }
 
     /**
@@ -107,7 +105,6 @@ public class TWAgentWorkingMemory {
         assert (sensedObjects.size() == objectXCoords.size() && sensedObjects.size() == objectYCoords.size());
 
 //        me.getEnvironment().getMemoryGrid().clear();  // THis is equivalent to only having sensed area in memory
-        memoryGrid.clear(); //delete everything 
 //       this.decayMemory();       // You might want to think about when to call the decay function as well.
         for (int i = 0; i < sensedObjects.size(); i++) {
             TWEntity o = (TWEntity) sensedObjects.get(i);
@@ -122,7 +119,7 @@ public class TWAgentWorkingMemory {
             //Add the object to memory
             objects[objectXCoords.get(i)][objectYCoords.get(i)] = new TWAgentPercept(o, this.getSimulationTime());
 
-            memoryGrid.set(objectXCoords.get(i), objectYCoords.get(i), o);
+//            memoryGrid.set(objectXCoords.get(i), objectYCoords.get(i), o);
 
             updateClosest(o);
             
@@ -322,7 +319,7 @@ public class TWAgentWorkingMemory {
         return (e instanceof TWObstacle);
     }
 
-    public ObjectGrid2D getMemoryGrid() {
-        return this.memoryGrid;
+    public TWAgentPercept[][] getObjects() {
+        return objects;
     }
 }

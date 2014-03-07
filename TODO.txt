@@ -1,0 +1,5 @@
+1. Improve combination function
+2. Think of ways to implement impossible function
+3. Path generator test, improve if needed
+4. Think how to implement reconsider
+5. Run and observe

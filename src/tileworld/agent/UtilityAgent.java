@@ -50,8 +50,8 @@ public class UtilityAgent extends TWAgent{
 		if(currentPlan == null || !currentPlan.hasNext() || impossible(currentPlan))
 		{
 			HashMap<IntentionType, Double> utilities = options();
-			Intention intention = filter(utilities);	
-			currentPlan = plan(intention);
+			currIntention = filter(utilities);	
+			currentPlan = plan(currIntention);
 		}
 		else
 		{
@@ -91,9 +91,12 @@ public class UtilityAgent extends TWAgent{
 	private TWPlan plan(Intention intention) {
 		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
 		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();
-		for(TWPathStep pathStep: path.getpath())
+		if(path != null)
 		{
-			thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
+			for(TWPathStep pathStep: path.getpath())
+			{
+				thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
+			}
 		}
 		switch(intention.getIntentionType())
 		{
@@ -168,13 +171,11 @@ public class UtilityAgent extends TWAgent{
 				TWTile tile = (TWTile)getEnvironment().getObjectGrid().get(x, y);
 				this.pickUpTile(tile);
 				this.getMemory().removeObject(tile);
-				this.getMemory().getObjects()[x][y] = null;
 				break;
 			case PUTDOWN:
 				TWHole hole = (TWHole)getEnvironment().getObjectGrid().get(x, y);
 				this.putTileInHole(hole);
 				this.getMemory().removeObject(hole);
-				this.getMemory().getObjects()[x][y] = null;
 			case REFUEL:
 				break;
 			default:

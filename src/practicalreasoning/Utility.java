@@ -44,6 +44,10 @@ public class Utility {
 		//combination function -> clustering
 
 		//Overall Utitlity -> final utility
+		selTileUtility = 0.0;
+		selHoleUtility = 0.0;
+		selectedTile = null;
+		selectedHole = null;
 		int x = environment.getxDimension();
 		int y = environment.getyDimension();
 		Double[][] utilities = new Double[x][y];
@@ -52,7 +56,7 @@ public class Utility {
 		{
 			for(int j = 0; j < y; j++)
 			{
-				TWAgentPercept percept = agent.getMemory().getObjects()[i][j];
+				TWAgentPercept percept = agent.getMemory().getPerceptAt(i, j);
 				if(percept == null || percept.getO() instanceof TWObstacle)
 					continue;
 				double distance = agent.getDistanceTo(percept.getO());		
@@ -72,7 +76,7 @@ public class Utility {
 				double neighbourScore = 0.0;
 				for(int k = i - XSearch; k < i + XSearch; k++)
 				{
-					for(int l = j - YSearch; l < l + YSearch; l++)
+					for(int l = j - YSearch; l < j + YSearch; l++)
 					{
 						if(!environment.isValidLocation(x, y) || utilities[k][l] == null)
 							continue;
@@ -84,12 +88,12 @@ public class Utility {
 				}
 //				double finalScore = Math.min(100, (1 - neighbourWeight) * utilities[i][j] + neighbourWeight * neighbourScore);
 				double finalScore = Math.min(100, utilities[i][j] + neighbourScore);
-				if(agent.getMemory().getObjects()[i][j].getO() instanceof TWTile)
+				if(agent.getMemory().getObjectAt(i, j) instanceof TWTile)
 				{				
 					if(finalScore > selTileUtility)
 					{
 						selTileUtility = finalScore;
-						selectedTile = (TWTile) agent.getMemory().getObjects()[i][j].getO();
+						selectedTile = (TWTile) agent.getMemory().getObjectAt(i, j);
 					}
 				}
 				else
@@ -97,7 +101,7 @@ public class Utility {
 					if(finalScore > selHoleUtility)
 					{
 						selHoleUtility = finalScore;
-						selectedHole = (TWHole) agent.getMemory().getObjects()[i][j].getO();
+						selectedHole = (TWHole) agent.getMemory().getObjectAt(i, j);
 					}
 				}
 				

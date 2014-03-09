@@ -33,7 +33,7 @@ public class SimpleTWAgent extends TWAgent{
 	protected TWThought think() {
 		//        getMemory().getClosestObjectInSensorRange(Tile.class);
 //		System.out.println("Simple Score: " + this.score);		
-		TWEntity current = (TWEntity) getMemory().getObjects()[x][y].getO();		
+		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
 			return new TWThought(TWAction.PICKUP, null);
 		else if(hasTile() && current instanceof TWHole)
@@ -61,13 +61,11 @@ public class SimpleTWAgent extends TWAgent{
 				TWTile tile = (TWTile)getEnvironment().getObjectGrid().get(x, y);
 				this.pickUpTile(tile);
 				this.getMemory().removeObject(tile);
-				this.getMemory().getObjects()[x][y] = null;
 				break;
 			case PUTDOWN:
 				TWHole hole = (TWHole)getEnvironment().getObjectGrid().get(x, y);
 				this.putTileInHole(hole);
 				this.getMemory().removeObject(hole);
-				this.getMemory().getObjects()[x][y] = null;
 			case REFUEL:
 				break;
 			default:

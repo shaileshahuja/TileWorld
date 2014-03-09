@@ -63,6 +63,7 @@ public class TWAgentWorkingMemory {
      * null if no objects are in sensor range
      */
     private HashMap<Class<?>, TWEntity> closestInSensorRange;
+	private ObjectGrid2D memoryGrid;
     static private List<Int2D> spiral = new NeighbourSpiral(Parameters.defaultSensorRange * 4).spiral();
 //    private List<TWAgent> neighbouringAgents = new ArrayList<TWAgent>();
 
@@ -74,7 +75,7 @@ public class TWAgentWorkingMemory {
         this.objects = new TWAgentPercept[x][y];
 
         this.schedule = schedule;
-//        this.memoryGrid = new ObjectGrid2D(me.getEnvironment().getxDimension(), me.getEnvironment().getyDimension());
+        this.memoryGrid = new ObjectGrid2D(me.getEnvironment().getxDimension(), me.getEnvironment().getyDimension());
     }
 
     /**
@@ -119,7 +120,7 @@ public class TWAgentWorkingMemory {
             //Add the object to memory
             objects[objectXCoords.get(i)][objectYCoords.get(i)] = new TWAgentPercept(o, this.getSimulationTime());
 
-//            memoryGrid.set(objectXCoords.get(i), objectYCoords.get(i), o);
+            memoryGrid.set(objectXCoords.get(i), objectYCoords.get(i), o);
 
             updateClosest(o);
             
@@ -183,6 +184,7 @@ public class TWAgentWorkingMemory {
 
     public void removeAgentPercept(int x, int y){
         objects[x][y] = null;
+    	memoryGrid.set(x, y, null);
     }
 
 
@@ -318,8 +320,20 @@ public class TWAgentWorkingMemory {
         //is it an obstacle?
         return (e instanceof TWObstacle);
     }
-
-    public TWAgentPercept[][] getObjects() {
-        return objects;
+    
+    public ObjectGrid2D getMemoryGrid()
+    {
+    	return memoryGrid;
     }
+    
+
+    public TWEntity getObjectAt(int x, int y) {
+    	if(objects[x][y] == null)
+    		return null;
+		return objects[x][y].getO();
+	}
+    
+    public TWAgentPercept getPerceptAt(int x, int y) {
+		return objects[x][y];
+	}
 }

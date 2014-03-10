@@ -101,6 +101,8 @@ public class TWAgentWorkingMemory {
         //reset the closest objects for new iteration of the loop (this is short
         //term observation memory if you like) It only lasts one timestep
         closestInSensorRange = new HashMap<Class<?>, TWEntity>(4);
+        
+        clearMemoryInSensorRange(Parameters.defaultSensorRange);
 
         //must all be same size.
         assert (sensedObjects.size() == objectXCoords.size() && sensedObjects.size() == objectYCoords.size());
@@ -150,7 +152,20 @@ public class TWAgentWorkingMemory {
 //        }
 //    }
     
-    /**
+    private void clearMemoryInSensorRange(int defaultsensorrange) {
+		for(int i = me.getX() - defaultsensorrange; i <= me.getX() + defaultsensorrange; i++)
+		{
+			for(int j = me.getY() - defaultsensorrange; j <= me.getY() + defaultsensorrange; j++)
+			{
+				if(!me.getEnvironment().isInBounds(i, j))
+					continue;
+				objects[i][j] = null;
+				memoryGrid.set(i, j, null);
+			}
+		}
+	}
+
+	/**
      * updates memory using 2d array of sensor range - currently not used
      * @see TWAgentWorkingMemory#updateMemory(sim.util.Bag, sim.util.IntBag, sim.util.IntBag)
      */

@@ -12,6 +12,7 @@ import tileworld.Parameters;
 import tileworld.TWGUI;
 import tileworld.agent.SimpleTWAgent;
 import tileworld.agent.TWAgent;
+import tileworld.agent.TWAgentWorkingMemory;
 import tileworld.agent.UtilityAgent;
 
 /**
@@ -96,7 +97,9 @@ public class TWEnvironment extends SimState implements Steppable {
         
         //Now we create some agents
 //        createAgent(new SimpleTWAgent(10, 1, this, Parameters.defaultFuelLevel),2);
-      createAgent(new UtilityAgent(10, 1, this, Parameters.defaultFuelLevel),2);
+        createAgent(new UtilityAgent(10, 1, this, Parameters.defaultFuelLevel),2);
+
+        createAgent(new UtilityAgent(10, 1, this, Parameters.defaultFuelLevel),3);
 
 //      createAgent(new VaisaghAgent(10, 1, this, Parameters.defaultFuelLevel),3);
 

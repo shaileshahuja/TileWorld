@@ -40,4 +40,14 @@ public class TWThought {
     public TWDirection getDirection() {
         return direction;
     }
+    
+    @Override
+    public String toString() {
+    	String result = action.name() + " ";
+    	if(direction != null)
+    		result += direction.name();
+    	else
+    		result += "null";
+    	return result;
+    }
 }

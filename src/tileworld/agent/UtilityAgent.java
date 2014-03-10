@@ -47,7 +47,7 @@ public class UtilityAgent extends TWAgent{
 	protected TWThought think() {
 		//        getMemory().getClosestObjectInSensorRange(Tile.class);
 		//		System.out.println("Simple Score: " + this.score);
-		if(currentPlan == null || !currentPlan.hasNext() || impossible(currentPlan))
+		if(currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext() || impossible(currentPlan))
 		{
 			HashMap<IntentionType, Double> utilities = options();
 			currIntention = filter(utilities);	
@@ -61,9 +61,14 @@ public class UtilityAgent extends TWAgent{
 				HashMap<IntentionType, Double> utilities = options();
 				newIntention = filter(utilities);	
 			}
-			if(!sound(currentPlan, newIntention))				
+			if(!sound(currentPlan, newIntention))	
+			{
 				currentPlan = plan(newIntention);
+				currIntention = newIntention;
+			}
 		}
+		System.out.println(currIntention);
+		System.out.println(currentPlan.peek());
 		return currentPlan.next();
 
 		////		TWEntity current = (TWEntity) getMemory().getObjects().get(x,  y);		
@@ -78,7 +83,7 @@ public class UtilityAgent extends TWAgent{
 	private boolean sound(TWPlan currentPlan2, Intention newIntention) {
 		if(newIntention == null)
 			return false;		
-		return !newIntention.equals(currIntention);	
+		return newIntention.equals(currIntention);	
 	}
 	private boolean reconsider(TWPlan currentPlan2) {
 		// TODO Auto-generated method stub
@@ -91,6 +96,14 @@ public class UtilityAgent extends TWAgent{
 	private TWPlan plan(Intention intention) {
 		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
 		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();
+		if(intention.getIntentionType().equals(IntentionType.EXPLORE))
+		{
+			while(path == null)
+			{
+				intention.setLocation(randomLocation());
+				path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
+			}
+		}
 		if(path != null)
 		{
 			for(TWPathStep pathStep: path.getpath())
@@ -123,8 +136,7 @@ public class UtilityAgent extends TWAgent{
 		}
 		if (explore)
 		{
-			Int2D location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
-							(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
+			Int2D location = randomLocation();
 			return new Intention(IntentionType.EXPLORE, location);
 		}
 
@@ -143,6 +155,14 @@ public class UtilityAgent extends TWAgent{
 				Utility.selectedHole.getY());
 	}
 
+	private Int2D randomLocation() {
+		Int2D location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
+						(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
+		while(getMemory().isCellBlocked(location.x, location.y))
+			location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
+					(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
+		return location;
+	}
 	private HashMap<IntentionType, Double> options() {
 		HashMap<IntentionType, Double> utilities = new HashMap<IntentionType, Double>();
 		Utility.updateNeighbourBasedUtility(this, getEnvironment());

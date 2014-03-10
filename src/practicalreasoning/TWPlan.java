@@ -27,6 +27,11 @@ public class TWPlan implements Iterator<TWThought>{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public TWThought peek()
+	{
+		return plan.peek();
+	}
 
 	 
 }

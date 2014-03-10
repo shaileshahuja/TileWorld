@@ -1,5 +1,6 @@
-1. Improve combination function
-2. Think of ways to implement impossible function
+1. Improve combination function / inverse functions
+2. Think of ways to implement impossible function checking for obstacles
 3. Path generator test, improve if needed
 4. Think how to implement reconsider
-5. Run and observe
+5. Run and observe, refuel scenario
+6. Better exploration, with custom path generator

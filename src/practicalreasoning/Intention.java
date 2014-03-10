@@ -12,6 +12,10 @@ public class Intention {
 		return location;
 	}
 
+	public void setLocation(Int2D loc) {
+		location = loc;
+	}
+	
 	private Int2D location;
 	
 	public Intention(IntentionType intentionType, Int2D int2d)
@@ -32,8 +36,16 @@ public class Intention {
 		if(!(obj instanceof Intention))
 			return false;
 		Intention other = (Intention) obj;
-		if(!other.intentionType.equals(intentionType))
+		
+		if(!other.intentionType.equals(this.intentionType))
 			return false;
+		if(this.intentionType.equals(IntentionType.EXPLORE))
+			return true;
 		return location.equals(other.location);
+	}
+	
+	@Override
+	public String toString() {
+		return intentionType.name() + " " + location.toCoordinates();
 	}
 }

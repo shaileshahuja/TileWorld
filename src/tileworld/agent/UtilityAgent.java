@@ -13,7 +13,7 @@ import practicalreasoning.IntentionType;
 import practicalreasoning.TWPlan;
 import practicalreasoning.Utility;
 import sim.util.Int2D;
-import tileworld.environment.TWDirection;
+import tileworld.environment.TWEntity;
 import tileworld.environment.TWEnvironment;
 import tileworld.environment.TWHole;
 import tileworld.environment.TWTile;
@@ -39,14 +39,25 @@ public class UtilityAgent extends TWAgent{
 	private TWPlan currentPlan = null;
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
+	private String name;
 
-	public UtilityAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel) {
+	public UtilityAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel, String name) {
 		super(xpos,ypos,env,fuelLevel);
 		pathGenerator = new AstarPathGenerator(getEnvironment(), this, Integer.MAX_VALUE);
+		this.name = name;
 	}
 	protected TWThought think() {
 		//        getMemory().getClosestObjectInSensorRange(Tile.class);
 		//		System.out.println("Simple Score: " + this.score);
+		
+		//reactive
+		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
+		if(carriedTiles.size() < 3 & current instanceof TWTile)
+			return new TWThought(TWAction.PICKUP, null);
+		if(hasTile() && current instanceof TWHole)
+			return new TWThought(TWAction.PUTDOWN, null);
+		
+		Utility.updateNeighbourBasedUtility(this, getEnvironment());
 		if(currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext() || impossible(currentPlan))
 		{
 			HashMap<IntentionType, Double> utilities = options();
@@ -67,6 +78,7 @@ public class UtilityAgent extends TWAgent{
 				currIntention = newIntention;
 			}
 		}
+		System.out.print(name + " ");
 		System.out.println(currIntention);
 		System.out.println(currentPlan.peek());
 		return currentPlan.next();
@@ -85,6 +97,7 @@ public class UtilityAgent extends TWAgent{
 			return false;		
 		return newIntention.equals(currIntention);	
 	}
+	
 	private boolean reconsider(TWPlan currentPlan2) {
 		// TODO Auto-generated method stub
 		return true;
@@ -94,22 +107,29 @@ public class UtilityAgent extends TWAgent{
 		return false;
 	}
 	private TWPlan plan(Intention intention) {
-		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
 		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();
-		if(intention.getIntentionType().equals(IntentionType.EXPLORE))
+		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
+		while(path == null)
 		{
-			while(path == null)
+			switch(intention.getIntentionType())
 			{
+			case EXPLORE:
 				intention.setLocation(randomLocation());
-				path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
+				break;
+			case FILLHOLE:
+				HashMap<IntentionType, Double> utilities = options();
+				currIntention = filter(utilities);	
+				break;
+			case PICKUPTILE:
+				break;
+			case REFUEL:
+				break;
 			}
+			path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
 		}
-		if(path != null)
+		for(TWPathStep pathStep: path.getpath())
 		{
-			for(TWPathStep pathStep: path.getpath())
-			{
-				thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
-			}
+			thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
 		}
 		switch(intention.getIntentionType())
 		{
@@ -127,6 +147,7 @@ public class UtilityAgent extends TWAgent{
 		}
 		return new TWPlan(thoughts);
 	}
+	
 	private Intention filter(HashMap<IntentionType, Double> utilities) {
 		boolean explore = true;
 		for(Double value: utilities.values())
@@ -148,11 +169,13 @@ public class UtilityAgent extends TWAgent{
 		}
 		if(utilities.get(IntentionType.PICKUPTILE) > utilities.get(IntentionType.FILLHOLE))
 		{
-			return new Intention(IntentionType.PICKUPTILE, Utility.selectedTile.getX(),
-					Utility.selectedTile.getY());
+			TWTile selected = Utility.getSelectedTile();
+			return new Intention(IntentionType.PICKUPTILE, selected.getX(),
+					selected.getY());
 		}
-		return new Intention(IntentionType.FILLHOLE, Utility.selectedHole.getX(),
-				Utility.selectedHole.getY());
+		TWHole selected  = Utility.getSelectedHole();
+		return new Intention(IntentionType.FILLHOLE, selected.getX(),
+				selected.getY());
 	}
 
 	private Int2D randomLocation() {
@@ -165,7 +188,6 @@ public class UtilityAgent extends TWAgent{
 	}
 	private HashMap<IntentionType, Double> options() {
 		HashMap<IntentionType, Double> utilities = new HashMap<IntentionType, Double>();
-		Utility.updateNeighbourBasedUtility(this, getEnvironment());
 		utilities.put(IntentionType.REFUEL, Utility.fueling(this, getEnvironment()));
 		utilities.put(IntentionType.PICKUPTILE, Utility.pickUpTile(this, getEnvironment()));
 		utilities.put(IntentionType.FILLHOLE, Utility.putInHole(this, getEnvironment()));
@@ -208,26 +230,8 @@ public class UtilityAgent extends TWAgent{
 	}
 
 
-	private TWDirection getRandomDirection(){
-
-		TWDirection randomDir = TWDirection.values()[this.getEnvironment().random.nextInt(5)];
-
-		if(this.getX()>=this.getEnvironment().getxDimension() ){
-			randomDir = TWDirection.W;
-		}else if(this.getX()<=1 ){
-			randomDir = TWDirection.E;
-		}else if(this.getY()<=1 ){
-			randomDir = TWDirection.S;
-		}else if(this.getY()>=this.getEnvironment().getxDimension() ){
-			randomDir = TWDirection.N;
-		}
-
-		return randomDir;
-
-	}
-
 	@Override
 	public String getName() {
-		return "Dumb Agent";
+		return name;
 	}
 }

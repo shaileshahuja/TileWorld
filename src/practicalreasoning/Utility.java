@@ -1,10 +1,13 @@
 package practicalreasoning;
 
+import java.util.PriorityQueue;
+
 import tileworld.Parameters;
 import tileworld.agent.TWAgent;
 import tileworld.agent.TWAgentPercept;
 import tileworld.environment.TWEnvironment;
 import tileworld.environment.TWHole;
+import tileworld.environment.TWObject;
 import tileworld.environment.TWObstacle;
 import tileworld.environment.TWTile;
 
@@ -18,9 +21,8 @@ public class Utility {
 	public static double neighbourWeight = 5;
 	public static double pickup2 = .33, pickup1 = .66, pickup0 = 1;
 	public static double putdown1 = .33, putdown2 = .66, putdown3 = 1;
-	public static TWTile selectedTile = null;
-	public static TWHole selectedHole = null;
-	private static double selTileUtility = 0.0, selHoleUtility = 0.0;
+	private static PriorityQueue<TWHole> holes;
+	private static PriorityQueue<TWTile> tiles;
 	public static int XSearch = 3, YSearch = 3;
 	public static double fueling(TWAgent agent, TWEnvironment environment)
 	{
@@ -44,10 +46,9 @@ public class Utility {
 		//combination function -> clustering
 
 		//Overall Utitlity -> final utility
-		selTileUtility = 0.0;
-		selHoleUtility = 0.0;
-		selectedTile = null;
-		selectedHole = null;
+		
+		holes = new PriorityQueue<TWHole>();
+		tiles = new PriorityQueue<TWTile>();
 		int x = environment.getxDimension();
 		int y = environment.getyDimension();
 		Double[][] utilities = new Double[x][y];
@@ -88,22 +89,12 @@ public class Utility {
 				}
 //				double finalScore = Math.min(100, (1 - neighbourWeight) * utilities[i][j] + neighbourWeight * neighbourScore);
 				double finalScore = Math.min(100, utilities[i][j] + neighbourScore);
-				if(agent.getMemory().getObjectAt(i, j) instanceof TWTile)
-				{				
-					if(finalScore > selTileUtility)
-					{
-						selTileUtility = finalScore;
-						selectedTile = (TWTile) agent.getMemory().getObjectAt(i, j);
-					}
-				}
+				TWObject currObj = (TWObject) agent.getMemory().getObjectAt(i, j);
+				currObj.utility = finalScore;
+				if(currObj instanceof TWTile)
+					tiles.add((TWTile) currObj);
 				else
-				{
-					if(finalScore > selHoleUtility)
-					{
-						selHoleUtility = finalScore;
-						selectedHole = (TWHole) agent.getMemory().getObjectAt(i, j);
-					}
-				}
+					holes.add((TWHole) currObj);
 				
 			}
 		}
@@ -119,11 +110,11 @@ public class Utility {
 		switch(agent.numberOfCarriedTiles())
 		{
 		case 0:
-			return selTileUtility * pickup0;
+			return tiles.peek().utility * pickup0;
 		case 1:
-			return selTileUtility * pickup1;
+			return tiles.peek().utility * pickup1;
 		case 2:
-			return selTileUtility * pickup2;
+			return tiles.peek().utility * pickup2;
 		default:
 			return 0;
 		}
@@ -134,13 +125,24 @@ public class Utility {
 		switch(agent.numberOfCarriedTiles())
 		{
 		case 3:
-			return selHoleUtility * putdown3;
+			return holes.peek().utility * putdown3;
 		case 2:
-			return selHoleUtility * putdown2;
+			return holes.peek().utility * putdown2;
 		case 1:
-			return selHoleUtility * putdown1;
+			return holes.peek().utility * putdown1;
 		default:
 			return 0;
 		}
 	}
+	
+	public static TWTile getSelectedTile()
+	{
+		return tiles.poll();
+	}
+	
+	public static TWHole getSelectedHole()
+	{
+		return holes.poll();
+	}
+	
 }

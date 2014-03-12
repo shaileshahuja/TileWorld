@@ -97,9 +97,9 @@ public class TWEnvironment extends SimState implements Steppable {
         
         //Now we create some agents
 //        createAgent(new SimpleTWAgent(10, 1, this, Parameters.defaultFuelLevel),2);
-        createAgent(new UtilityAgent(10, 1, this, Parameters.defaultFuelLevel),2);
+        createAgent(new UtilityAgent(0, 0, this, Parameters.defaultFuelLevel, "First"),2);
 
-        createAgent(new UtilityAgent(10, 1, this, Parameters.defaultFuelLevel),3);
+//        createAgent(new UtilityAgent(1, 1, this, Parameters.defaultFuelLevel, "Second"),3);
 
 //      createAgent(new VaisaghAgent(10, 1, this, Parameters.defaultFuelLevel),3);
 

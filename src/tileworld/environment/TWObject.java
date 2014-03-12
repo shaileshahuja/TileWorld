@@ -18,10 +18,11 @@ import tileworld.Parameters;
  * Description: a class which is represent a transient entity in Tileworld (i.e., one with a lifetime).
  *
  */
-public class TWObject extends TWEntity{
+public class TWObject extends TWEntity implements Comparable<TWObject>{
 
 	protected static final int lifeTime = Parameters.lifeTime;
-	
+
+	public Double utility;
 	private double creationTime;
 	private double dTime;
 	
@@ -64,6 +65,11 @@ public class TWObject extends TWEntity{
     protected void move(TWDirection d) {
         throw new UnsupportedOperationException("TWObjects are not movable.");
     }
+
+	@Override
+	public int compareTo(TWObject o) {
+		return this.utility.compareTo(o.utility);
+	}
 	
 	
 

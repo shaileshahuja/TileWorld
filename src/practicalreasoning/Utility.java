@@ -107,6 +107,10 @@ public class Utility {
 
 	public static double pickUpTile(TWAgent agent, TWEnvironment environment)
 	{
+		if (tiles.peek() == null)
+		{
+			return 0;
+		}
 		switch(agent.numberOfCarriedTiles())
 		{
 		case 0:
@@ -122,6 +126,10 @@ public class Utility {
 
 	public static double putInHole(TWAgent agent, TWEnvironment environment)
 	{
+		if (holes.peek() == null)
+		{
+			return 0;
+		}
 		switch(agent.numberOfCarriedTiles())
 		{
 		case 3:

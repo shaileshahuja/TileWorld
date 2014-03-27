@@ -41,7 +41,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
 
     public TWAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel) {
         super(xpos, ypos, env);
-       
+        
         this.score = 0;
         this.fuelLevel = fuelLevel;
         this.carriedTiles = new ArrayList<TWTile>();

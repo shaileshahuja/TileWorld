@@ -6,7 +6,6 @@ package tileworld;
 
 import sim.engine.SimState;
 import tileworld.environment.TWEnvironment;
-
 /**
  * TileworldMain
  *
@@ -27,7 +26,7 @@ public class TileworldMain {
 
         TWEnvironment tw = new TWEnvironment(Parameters.seed);
         tw.start();
-
+      
         long steps = 0;
 
         while (steps < Parameters.endTime) {

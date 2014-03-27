@@ -24,6 +24,7 @@ public class Utility {
 	private static PriorityQueue<TWHole> holes;
 	private static PriorityQueue<TWTile> tiles;
 	public static int XSearch = 3, YSearch = 3;
+	
 	public static double fueling(TWAgent agent, TWEnvironment environment)
 	{
 		double fuelLevel = agent.getFuelLevel();
@@ -40,13 +41,7 @@ public class Utility {
 	}
 
 	public static void updateNeighbourBasedUtility(TWAgent agent, TWEnvironment environment)
-	{
-		//List<Tiles, UT>
-		//params: memory decay, distance
-		//combination function -> clustering
-
-		//Overall Utitlity -> final utility
-		
+	{	
 		holes = new PriorityQueue<TWHole>();
 		tiles = new PriorityQueue<TWTile>();
 		int x = environment.getxDimension();
@@ -66,7 +61,6 @@ public class Utility {
 				utilities[i][j] = normalDistribution(100, 0, deviationTiles, (distance/maxDistance)) * decayMultiplier;
 			}
 		}
-//		Double[][] combinedUtilities = new Double[x][y];
 		
 		for(int i = 0; i < x; i++)
 		{
@@ -82,12 +76,10 @@ public class Utility {
 						if(!environment.isValidLocation(x, y) || utilities[k][l] == null)
 							continue;
 						double distance = environment.getDistance(i, j, k, l);
-						//TODO: improve this function
 						double distScore = normalDistribution(neighbourWeight, 0, deviationNeighbour, (distance + utilities[k][l])/ (maxDistance+ utilities[k][l]));
 						neighbourScore += distScore;
 					}
 				}
-//				double finalScore = Math.min(100, (1 - neighbourWeight) * utilities[i][j] + neighbourWeight * neighbourScore);
 				double finalScore = Math.min(100, utilities[i][j] + neighbourScore);
 				TWObject currObj = (TWObject) agent.getMemory().getObjectAt(i, j);
 				currObj.utility = finalScore;

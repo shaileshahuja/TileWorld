@@ -40,6 +40,7 @@ public class UtilityAgent extends TWAgent{
 	private TWPlan currentPlan = null;
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
+
 	private String name;
 
 	public UtilityAgent(int xpos, int ypos, TWEnvironment env, double fuelLevel, String name) {

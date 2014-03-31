@@ -12,9 +12,9 @@ public class UtilityParams {
 	public static final String PICKUP_ZERO_TILES = "pickup0";
 	public static final String PICKUP_ONE_TILES = "pickup1";
 	public static final String PICKUP_TWO_TILES = "pickup2";
-	public static final String PICKUP_ONE_HOLES = "putdown1";
-	public static final String PICKUP_TWO_HOLES = "putdown2";
-	public static final String PICKUP_THREE_HOLES = "putdown3";
+	public static final String PUTDOWN_ONE_HOLES = "putdown1";
+	public static final String PUTDOWN_TWO_HOLES = "putdown2";
+	public static final String PUTDOWN_THREE_HOLES = "putdown3";
 	public static final String NEIGHBOUR_SEARCH_LIMIT_X = "XSearch";
 	public static final String NEIGHBOUR_SEARCH_LIMIT_Y = "YSearch";
 	
@@ -30,9 +30,9 @@ public class UtilityParams {
 		params.put(PICKUP_ZERO_TILES, 1.0);
 		params.put(PICKUP_ONE_TILES, 0.66);
 		params.put(PICKUP_TWO_TILES, 0.33);
-		params.put(PICKUP_ONE_HOLES, 0.33);
-		params.put(PICKUP_TWO_HOLES, 0.66);
-		params.put(PICKUP_THREE_HOLES, 1.0);
+		params.put(PUTDOWN_ONE_HOLES, 0.33);
+		params.put(PUTDOWN_TWO_HOLES, 0.66);
+		params.put(PUTDOWN_THREE_HOLES, 1.0);
 		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
 		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
 		return params;

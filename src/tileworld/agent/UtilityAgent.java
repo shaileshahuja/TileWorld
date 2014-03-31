@@ -13,6 +13,7 @@ import practicalreasoning.IntentionType;
 import practicalreasoning.TWPlan;
 import practicalreasoning.Utility;
 import sim.util.Int2D;
+import tileworld.environment.TWDirection;
 import tileworld.environment.TWEntity;
 import tileworld.environment.TWEnvironment;
 import tileworld.environment.TWHole;
@@ -106,6 +107,7 @@ public class UtilityAgent extends TWAgent{
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
 	private TWPlan plan(Intention intention) {
 		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();
 		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
@@ -228,7 +230,38 @@ public class UtilityAgent extends TWAgent{
 			// Cell is blocked, replan?
 		}
 	}
-
+	
+	public TWDirection findReactiveDirection(int tx, int ty) {
+		// TODO Auto-generated method stub
+		int sx = x;
+		int sy = y;
+		if(tx > sx)
+		{
+			if(!getMemory().isCellBlocked(sx + 1, sy))
+				return TWDirection.E;
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.N;			
+		}
+		else if(tx < sx)
+		{
+			if(!getMemory().isCellBlocked(sx - 1, sy))
+				return TWDirection.W;
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.N;	
+		}
+		else
+		{
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1))
+				return TWDirection.N;	
+		}		
+		return null;	
+	}
 
 	@Override
 	public String getName() {

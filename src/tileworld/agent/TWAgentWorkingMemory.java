@@ -3,6 +3,8 @@ package tileworld.agent;
 import java.util.HashMap;
 import java.util.List;
 
+import org.omg.CORBA.Environment;
+
 import sim.engine.Schedule;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
@@ -322,15 +324,18 @@ public class TWAgentWorkingMemory {
      * 
      * @param tx x position of cell
      * @param ty y position of cell
+     * @param decay if the memory of the object is older than this parameter, returns false; pass -1 to ignore this parameter
      * @return true if the cell is blocked in our memory
      */
-    public boolean isCellBlocked(int tx, int ty) {
-
+    public boolean isCellBlocked(int tx, int ty, int decay) {
+    	if(!me.getEnvironment().isInBounds(tx, ty))
+    		return true;
         //no memory at all, so assume not blocked
         if (objects[tx][ty] == null) {
             return false;
         }
-
+        if(decay >= 0 && me.getEnvironment().schedule.getTime() - objects[tx][ty].getT() > decay)
+        	return false;
         TWEntity e = (TWEntity) objects[tx][ty].getO();
         //is it an obstacle?
         return (e instanceof TWObstacle);

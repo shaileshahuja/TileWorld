@@ -36,7 +36,7 @@ public class WavyRandomPathGenerator{
 			{
 				
 			}
-			pathStep.
+//			pathStep.
 		}
 		TWPathStep pathStep = new TWPathStep(curX, curY, TWDirection.E);
 		

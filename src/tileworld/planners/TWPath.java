@@ -167,4 +167,9 @@ public class TWPath {
     public boolean hasNext() {
         return this.path.peekFirst() != null;
     }
+    
+    public int size()
+    {
+    	return path.size();
+    }
 }

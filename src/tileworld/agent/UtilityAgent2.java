@@ -14,9 +14,7 @@ import java.util.PriorityQueue;
 import practicalreasoning.Intention;
 import practicalreasoning.IntentionType;
 import practicalreasoning.TWPlan;
-import practicalreasoning.Utility;
 import practicalreasoning.UtilityParams;
-
 import sim.util.Int2D;
 import tileworld.Parameters;
 import tileworld.environment.TWDirection;
@@ -30,6 +28,7 @@ import tileworld.exceptions.CellBlockedException;
 import tileworld.planners.AstarPathGenerator;
 import tileworld.planners.TWPath;
 import tileworld.planners.TWPathStep;
+import tileworld.planners.TWRefuelPathGenerator;
 
 /**
  * TWContextBuilder
@@ -52,16 +51,16 @@ public class UtilityAgent2 extends TWAgent{
 	private TWPlan currentPlan = null;
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
-	//private FuelPathGenerator fuelPathGen;
+	private TWRefuelPathGenerator fuelPathGen;
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
-	public static double exploreThreshold = 10;
-	public UtilityAgent2(int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
+	public UtilityAgent2(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
 		super(xpos,ypos,env,fuelLevel);
 		pathGenerator = new AstarPathGenerator(env, this, Integer.MAX_VALUE);
-		//fuelPathGen = new FuelPathGenerator();
+		fuelPathGen = new TWRefuelPathGenerator(this);
 		//reactivePathGen = new ReactivePathGenerator();
 		this.parameters = parameters;
+		this.name = name;
 	}
 
 	protected TWThought think() {
@@ -71,16 +70,21 @@ public class UtilityAgent2 extends TWAgent{
 			return new TWThought(TWAction.PICKUP, null);
 		if(hasTile() && current instanceof TWHole)
 			return new TWThought(TWAction.PUTDOWN, null);
-
+		if(x == getEnvironment().getFuelingStation().getX() && y == getEnvironment().getFuelingStation().getY() && getFuelLevel() / Parameters.defaultFuelLevel < 0.5)
+			return new TWThought(TWAction.REFUEL, null);
+		if(surrounded())
+			return new TWThought(null, null);
+		//add reaction wait() if obstacles on all four sides
 		//Start of rational part
 
-		Utility(this,getEnvironment());
+		computeUtilities();
 		if(impossible(currentPlan))
 		{
 			HashMap<IntentionType, Double> utilities = options();
 			currIntention = filter(utilities);	
 			currentPlan = plan(currIntention);
 		}
+		else
 		{
 			Intention newIntention = null;
 			if(reconsider(currentPlan))
@@ -100,19 +104,27 @@ public class UtilityAgent2 extends TWAgent{
 		return currentPlan.next();
 	}
 
-	private boolean reconsider(TWPlan currentPlan2) {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean surrounded() {
+		return getMemory().isCellBlocked(x, y + 1, -1) && getMemory().isCellBlocked(x, y - 1, -1)
+				&& getMemory().isCellBlocked(x + 1, y, -1) && getMemory().isCellBlocked(x - 1, y, -1);
+	}
+
+	private boolean reconsider(TWPlan currentPlan)
+	{
+		return true;
 	}
 
 	private boolean sound(TWPlan currentPlan2, Intention newIntention) {
-		// TODO Auto-generated method stub
-		return false;
+		if(newIntention == null)
+			return true;		
+		return newIntention.equals(currIntention);
 	}
 
 	@Override
 	protected void act(TWThought thought) {
-
+		//case when we wait
+		if(thought.getAction() == null)
+			return;
 		try {
 			switch(thought.getAction())
 			{
@@ -129,6 +141,7 @@ public class UtilityAgent2 extends TWAgent{
 				this.putTileInHole(hole);
 				this.getMemory().removeObject(hole);
 			case REFUEL:
+				refuel();
 				break;
 			default:
 				break;			
@@ -138,27 +151,9 @@ public class UtilityAgent2 extends TWAgent{
 	}
 
 
-	private TWDirection getRandomDirection(){
-
-		TWDirection randomDir = TWDirection.values()[this.getEnvironment().random.nextInt(5)];
-
-		if(this.getX()>=this.getEnvironment().getxDimension() ){
-			randomDir = TWDirection.W;
-		}else if(this.getX()<=1 ){
-			randomDir = TWDirection.E;
-		}else if(this.getY()<=1 ){
-			randomDir = TWDirection.S;
-		}else if(this.getY()>=this.getEnvironment().getxDimension() ){
-			randomDir = TWDirection.N;
-		}
-
-		return randomDir;
-
-	}
-
 	@Override
 	public String getName() {
-		return "Dumb Agent";
+		return name;
 	}
 
 	public HashMap<String, Double> getParameters(){
@@ -169,13 +164,13 @@ public class UtilityAgent2 extends TWAgent{
 		return (currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext());
 		}
 
-	public double fueling(TWAgent agent, TWEnvironment environment)
+	public double fueling()
 	{
-		double fuelLevel = agent.getFuelLevel();
-		if((Parameters.endTime - environment.schedule.getTime()) <= fuelLevel)
+		double fuelLevel = getFuelLevel();
+		if((Parameters.endTime - getEnvironment().schedule.getTime()) <= fuelLevel)
 			return 0;
-		double bufferFuel = (environment.getxDimension() + environment.getyDimension()) * parameters.get("bufferRatio");
-		double distance = agent.getDistanceTo(environment.getFuelingStation());
+		double bufferFuel = (getEnvironment().getxDimension() + getEnvironment().getyDimension()) * parameters.get(UtilityParams.BUFFER_RATIO);
+		double distance = getDistanceTo(getEnvironment().getFuelingStation());
 		distance += bufferFuel; 
 
 		//reactive
@@ -183,47 +178,56 @@ public class UtilityAgent2 extends TWAgent{
 			return 99.99;
 		return distance / fuelLevel * 100;
 	}
-	public void Utility(TWAgent agent, TWEnvironment environment)
+	
+	public void computeUtilities()
 	{	
 		this.holes = new PriorityQueue<TWHole>();
 		this.tiles = new PriorityQueue<TWTile>();
-		int x = environment.getxDimension();
-		int y = environment.getyDimension();
+		int x = getEnvironment().getxDimension();
+		int y = getEnvironment().getyDimension();
 		Double[][] utilities = new Double[x][y];
 		int maxDistance = x + y;
 		for(int i = 0; i < x; i++)
 		{
 			for(int j = 0; j < y; j++)
 			{
-				TWAgentPercept percept = agent.getMemory().getPerceptAt(i, j);
+				TWAgentPercept percept = getMemory().getPerceptAt(i, j);
 				if(percept == null || percept.getO() instanceof TWObstacle)
 					continue;
-				double distance = agent.getDistanceTo(percept.getO());		
-				double howOld = environment.schedule.getTime() - percept.getT();
-				double decayMultiplier = normalDistribution(1, 0, parameters.get("deviationMemoryDecay"), howOld);
-				utilities[i][j] = normalDistribution(100, 0, parameters.get("deviationTiles"), (distance/maxDistance)) * decayMultiplier;
+				double distance = getDistanceTo(percept.getO());		
+				double howOld = getEnvironment().schedule.getTime() - percept.getT();
+				double decayMultiplier = normalDistribution(1, 0, parameters.get(UtilityParams.DEVIATION_MEM_DECAY), howOld);
+				if(percept.getO() instanceof TWTile)
+					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_TILES), (distance/maxDistance)) * decayMultiplier;
+				if(percept.getO() instanceof TWHole)
+					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_HOLES), (distance/maxDistance)) * decayMultiplier;
 			}
 		}
-
+		int xSearchLimit = parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X).intValue();
+		int ySearchLimit = parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y).intValue();
 		for(int i = 0; i < x; i++)
 		{
 			for(int j = 0; j < y; j++)
 			{
 				if(utilities[i][j] == null)
 					continue;
-				for(int k = i - parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X).intValue(); k < i + parameters.get("XSearch"); k++)
+				TWObject currObj = (TWObject) getMemory().getObjectAt(i, j);
+				currObj.setPathTo(pathGenerator.findPath(this.x, this.y, i, j, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()));				
+				if(currObj.getPathTo() == null)
+					continue;
+				for(int k = i - xSearchLimit; k < i + xSearchLimit; k++)
 				{
-					for(int l = j - parameters.get("YSearch").intValue(); l < j + parameters.get("YSearch"); l++)
+					for(int l = j - ySearchLimit; l < j + ySearchLimit; l++)
 					{
-						if(!environment.isValidLocation(x, y) || utilities[k][l] == null)
+						if(!getEnvironment().isValidLocation(k, l) || utilities[k][l] == null)
 							continue;
-						double distance = environment.getDistance(i, j, k, l);
-						double distScore = normalDistribution(utilities[k][l], 0, parameters.get("deviationNeighbour"), (distance + utilities[k][l])/ (maxDistance+ utilities[k][l]));
-						utilities[i][j] = combinationFunction(utilities[i][j], distScore);
+						double distance = getEnvironment().getDistance(i, j, k, l);
+						double neightbourUtility = normalDistribution(utilities[k][l], 0, parameters.get(UtilityParams.DEVIATION_NEIGHBOUR), distance / maxDistance);
+						utilities[i][j] = combineUtilities(utilities[i][j], neightbourUtility);
 					}
 				}
-				TWObject currObj = (TWObject) agent.getMemory().getObjectAt(i, j);
-				currObj.utility = utilities[i][j];
+				double pathLengthAdjustment = getDistanceTo(currObj) / currObj.getPathTo().size();
+				currObj.setUtility(utilities[i][j] * pathLengthAdjustment);
 				if(currObj instanceof TWTile)
 					tiles.add((TWTile) currObj);
 				else
@@ -233,107 +237,58 @@ public class UtilityAgent2 extends TWAgent{
 		}
 	}
 
-	public double pickUpTile(TWAgent agent, TWEnvironment environment)
+	public double pickUpTile()
 	{
 		if (this.tiles.peek() == null)
 		{
 			return 0;
 		}
-		switch(agent.numberOfCarriedTiles())
+		switch(numberOfCarriedTiles())
 		{
 		case 0:
-			return tiles.peek().utility * parameters.get(UtilityParams.PICKUP_ZERO_TILES);
+			return tiles.peek().getUtility() * parameters.get(UtilityParams.PICKUP_ZERO_TILES);
 		case 1:
-			return tiles.peek().utility * parameters.get(UtilityParams.PICKUP_ONE_TILES);
+			return tiles.peek().getUtility() * parameters.get(UtilityParams.PICKUP_ONE_TILES);
 		case 2:
-			return tiles.peek().utility * parameters.get(UtilityParams.PICKUP_TWO_TILES);
+			return tiles.peek().getUtility() * parameters.get(UtilityParams.PICKUP_TWO_TILES);
 		default:
 			return 0;
 		}
 	}
 
-	public double putInHole(TWAgent agent, TWEnvironment environment)
+	public double putInHole()
 	{
 		if (this.holes.peek() == null)
 		{
 			return 0;
 		}
-		switch(agent.numberOfCarriedTiles())
+		switch(numberOfCarriedTiles())
 		{
 		case 3:
-			return holes.peek().utility * parameters.get(UtilityParams.PICKUP_THREE_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_THREE_HOLES);
 		case 2:
-			return holes.peek().utility * parameters.get(UtilityParams.PICKUP_TWO_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_TWO_HOLES);
 		case 1:
-			return holes.peek().utility * parameters.get(UtilityParams.PICKUP_ONE_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_ONE_HOLES);
 		default:
 			return 0;
 		}
 	}
 
-	public TWTile getSelectedTile()
-	{
-		return tiles.poll();
-	}
 
-	public TWHole getSelectedHole()
-	{
-		return holes.poll();
-	}
-
-	private TWPlan plan(Intention intention) {
-		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();
-		TWPath path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
-		while(path == null)
-			
-			//
-			//
-			//This is where we should use different pathgenerators based on which intention we have.
-			//And make sure that we don't return null values.
-			//
-		{
-			switch(intention.getIntentionType())
-			{
-			case EXPLORE:
-				intention.setLocation(randomLocation());
-				break;
-			case FILLHOLE:
-				HashMap<IntentionType, Double> utilities = options();
-				currIntention = filter(utilities);	
-				break;
-			case PICKUPTILE:
-				break;
-			case REFUEL:
-				break;
-			}
-			path = pathGenerator.findPath(getX(), getY(), intention.getLocation().x, intention.getLocation().y);
-		}
-		for(TWPathStep pathStep: path.getpath())
-		{
-			thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
-		}
-		switch(intention.getIntentionType())
-		{
-		case EXPLORE:
-			break;
-		case FILLHOLE:
-			thoughts.add(new TWThought(TWAction.PUTDOWN, null));
-			break;
-		case PICKUPTILE:
-			thoughts.add(new TWThought(TWAction.PICKUP, null));
-			break;
-		case REFUEL:
-			thoughts.add(new TWThought(TWAction.REFUEL, null));
-			break;
-		}
-		return new TWPlan(thoughts);
+	private HashMap<IntentionType, Double> options() {
+		HashMap<IntentionType, Double> utilities = new HashMap<IntentionType, Double>();
+		utilities.put(IntentionType.REFUEL, fueling());
+		utilities.put(IntentionType.PICKUPTILE, pickUpTile());
+		utilities.put(IntentionType.FILLHOLE, putInHole());
+		return utilities;
 	}
 	
 	private Intention filter(HashMap<IntentionType, Double> utilities) {
 		boolean explore = true;
 		for(Double value: utilities.values())
 		{
-			if(value > exploreThreshold)
+			if(value > parameters.get(UtilityParams.THRESHOLD_EXPLORE))
 				explore = false;
 		}
 		if (explore)
@@ -350,39 +305,118 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(utilities.get(IntentionType.PICKUPTILE) > utilities.get(IntentionType.FILLHOLE))
 		{
-			TWTile selected = Utility.getSelectedTile();
+			TWTile selected = tiles.peek();
 			return new Intention(IntentionType.PICKUPTILE, selected.getX(),
 					selected.getY());
 		}
-		TWHole selected  = Utility.getSelectedHole();
+		TWHole selected  = holes.peek();
 		return new Intention(IntentionType.FILLHOLE, selected.getX(),
 				selected.getY());
 	}
-
-	private HashMap<IntentionType, Double> options() {
-		HashMap<IntentionType, Double> utilities = new HashMap<IntentionType, Double>();
-		utilities.put(IntentionType.REFUEL, Utility.fueling(this, getEnvironment()));
-		utilities.put(IntentionType.PICKUPTILE, Utility.pickUpTile(this, getEnvironment()));
-		utilities.put(IntentionType.FILLHOLE, Utility.putInHole(this, getEnvironment()));
-		return utilities;
+	
+	private TWPlan plan(Intention intention) {
+		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();			//
+			//
+			//This is where we should use different pathgenerators based on which intention we have.
+			//And make sure that we don't return null values.
+			//
+		TWPath path = null;
+		switch(intention.getIntentionType())
+		{
+		case EXPLORE:
+			//TODO: change explore path generator to something cooler
+			path = pathGenerator.findPath(x, y, intention.getLocation().x, intention.getLocation().y, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue());
+			break;
+		case FILLHOLE:
+			path = holes.peek().getPathTo();
+			break;
+		case PICKUPTILE:
+			path = tiles.peek().getPathTo();
+			break;
+		case REFUEL:
+			path = fuelPathGen.generateRefuelPath();
+			break;
+		}
+		if(path == null)
+		{
+			thoughts.add(new TWThought(TWAction.MOVE, findReactiveDirection(intention.getLocation().getX(), intention.getLocation().getY())));
+		}
+		else
+		{
+			for(TWPathStep pathStep: path.getpath())
+				thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
+		}
+		return new TWPlan(thoughts);
 	}
+	
+	
 	private Int2D randomLocation() {
 		Int2D location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
 				(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
-		while(getMemory().isCellBlocked(location.x, location.y))
+		while(getMemory().isCellBlocked(location.x, location.y, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()))
 			location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
 					(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
 		return location;
 	}
 
-	private double normalDistribution(double a, double b, double c, double x)
-	{
-		return a*Math.exp(-1*(Math.pow(x - b, 2)) / (2 * Math.pow(c, 2)));
+	public TWDirection findReactiveDirection(int tx, int ty) {
+		int sx = x;
+		int sy = y;
+		//try to find the best direction according to the given target
+		if(tx > sx)
+		{
+			if(!getMemory().isCellBlocked(sx + 1, sy, -1))
+				return TWDirection.E;
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.N;			
+		}
+		else if(tx < sx)
+		{
+			if(!getMemory().isCellBlocked(sx - 1, sy, -1))
+				return TWDirection.W;
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.N;	
+		}
+		else
+		{
+			if(ty > sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.S;
+			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
+				return TWDirection.N;	
+		}		
+		
+		//give up and return any unblocked side
+		// at least one side is unblocked, as the code checks for it in the beginning
+		if(!getMemory().isCellBlocked(sx, sy + 1, -1))
+			return TWDirection.S;
+		if(!getMemory().isCellBlocked(sx, sy - 1, -1))
+			return TWDirection.N;
+		if(!getMemory().isCellBlocked(sx + 1, sy, -1))
+			return TWDirection.E;
+		else
+			return TWDirection.W;
 	}
 
-	public  double combinationFunction (double x, double y) {
-		double result = Math.pow(Math.tanh(atanh(Math.pow(x, 5)) + atanh(Math.pow(y, 5))),1/5);
-		return result;
+	
+	/**
+	 * Returns y value corresponding to the input x from the normal distribution function
+	 * Consider using exponential function as well.
+	 */
+	private double normalDistribution(double peak, double mean, double std, double x)
+	{
+		return peak*Math.exp(-1*(Math.pow(x - mean, 2)) / (2 * Math.pow(std, 2)));
+	}
+
+	public  double combineUtilities (double x, double y) {
+		double d = parameters.get(UtilityParams.WEIGHT_COMBINATION);
+		x /= 100.0;
+		y /= 100.0;
+		double result = Math.pow(Math.tanh(atanh(Math.pow(x, d)) + atanh(Math.pow(y, d))),1/d);
+		return result * 100;
 	}
 	private  double atanh(double x) {
 		double result = 0.5 *(Math.log(1+x)-Math.log(1-x));

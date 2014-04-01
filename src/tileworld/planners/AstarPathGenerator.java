@@ -28,7 +28,7 @@ import tileworld.environment.TWEnvironment;
  * long term plans begins to make less sense. Another reactive agent may perform
  * better in certain circumstances.
  */
-public class AstarPathGenerator implements TWPathGenerator {
+public class AstarPathGenerator{
 
     /** The set of nodes that have been searched through */
     private ArrayList closed = new ArrayList();
@@ -86,9 +86,9 @@ public class AstarPathGenerator implements TWPathGenerator {
     /**
      * @see PathFinder#findPath(Mover, int, int, int, int)
      */
-    public TWPath findPath(int sx, int sy, int tx, int ty) {
+    public TWPath findPath(int sx, int sy, int tx, int ty, int decay) {
         // easy first check, if the destination is blocked, we can't get there
-        if (agent.getMemory().isCellBlocked(tx, ty)) {
+        if (agent.getMemory().isCellBlocked(tx, ty, decay)) {
             return null;
         }
 
@@ -139,7 +139,7 @@ public class AstarPathGenerator implements TWPathGenerator {
 
                     //Check that the cell is valid (in bounds) and that according
                     //to our memory the cell isn't blocked
-                    if (isValidLocation(sx, sy, xp, yp) && !agent.getMemory().isCellBlocked(xp, yp)) {
+                    if (isValidLocation(sx, sy, xp, yp) && !agent.getMemory().isCellBlocked(xp, yp, decay)) {
                         // the cost to get to this node is cost the current plus the movement
                         // cost to reach this node. Note that the heursitic value is only used
                         // in the sorted open list

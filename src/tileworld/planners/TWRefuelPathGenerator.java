@@ -1,9 +1,8 @@
 package tileworld.planners;
-import practicalreasoning.Utility;
 import tileworld.Parameters;
 import tileworld.agent.SimpleTWAgent;
 import tileworld.agent.TWAgent;
-import tileworld.agent.UtilityAgent;
+import tileworld.agent.UtilityAgent2;
 import tileworld.environment.TWEnvironment;
 
 
@@ -16,13 +15,13 @@ public class TWRefuelPathGenerator
 {
 	private AstarPathGenerator astarObject;
 	private TWEnvironment environment;
-	private UtilityAgent agent;
+	private UtilityAgent2 agent;
 	
-	public TWRefuelPathGenerator(UtilityAgent agent)
+	public TWRefuelPathGenerator(UtilityAgent2 utilityAgent2)
 	{
-		this.agent = agent;
+		this.agent = utilityAgent2;
 		this.astarObject = new AstarPathGenerator(this.agent.getEnvironment(), this.agent, Integer.MAX_VALUE);
-		this.environment = agent.getEnvironment();
+		this.environment = utilityAgent2.getEnvironment();
 	} 
 	
 	public TWPath generateRefuelPath(){
@@ -57,7 +56,7 @@ public class TWRefuelPathGenerator
 			while(y<=l && y<= columns)
 			{
 				
-				pathToReturn = astarObject.findPath(agent.getX(), agent.getY(), x, y);
+				pathToReturn = astarObject.findPath(agent.getX(), agent.getY(), x, y, -1);
 				if(pathToReturn != null)
 				{
 					double distance1 = pathToReturn.getpath().size();

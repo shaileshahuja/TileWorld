@@ -5,6 +5,7 @@ package tileworld.environment;
 
 import sim.util.Int2D;
 import tileworld.Parameters;
+import tileworld.planners.TWPath;
 
 /**
  * TWObject
@@ -22,7 +23,8 @@ public class TWObject extends TWEntity implements Comparable<TWObject>{
 
 	protected static final int lifeTime = Parameters.lifeTime;
 
-	public Double utility;
+	private Double utility;
+	private TWPath pathTo;
 	private double creationTime;
 	private double dTime;
 	
@@ -70,7 +72,23 @@ public class TWObject extends TWEntity implements Comparable<TWObject>{
 	public int compareTo(TWObject o) {
 		return this.utility.compareTo(o.utility);
 	}
-	
+
+	public TWPath getPathTo() {
+		return pathTo;
+	}
+
+	public void setPathTo(TWPath pathTo) {
+		this.pathTo = pathTo;
+	}
+
+	public Double getUtility() {
+		return utility;
+	}
+
+	public void setUtility(Double utility) {
+		this.utility = utility;
+	}
+
 	
 
 }

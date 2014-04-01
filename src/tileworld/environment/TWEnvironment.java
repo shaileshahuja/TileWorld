@@ -3,6 +3,7 @@
  */
 package tileworld.environment;
 
+import practicalreasoning.UtilityParams;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.ObjectGrid2D;
@@ -10,10 +11,8 @@ import sim.util.Bag;
 import sim.util.Int2D;
 import tileworld.Parameters;
 import tileworld.TWGUI;
-import tileworld.agent.SimpleTWAgent;
 import tileworld.agent.TWAgent;
-import tileworld.agent.TWAgentWorkingMemory;
-import tileworld.agent.UtilityAgent;
+import tileworld.agent.UtilityAgent2;
 
 /**
  * TWEnvironment
@@ -97,7 +96,7 @@ public class TWEnvironment extends SimState implements Steppable {
         
         //Now we create some agents
 //        createAgent(new SimpleTWAgent(10, 1, this, Parameters.defaultFuelLevel),2);
-        createAgent(new UtilityAgent(0, 0, this, Parameters.defaultFuelLevel, "First"),2);
+        createAgent(new UtilityAgent2("First", 0, 0, this, Parameters.defaultFuelLevel, UtilityParams.defaultParams()),2);
 
 //        createAgent(new UtilityAgent(1, 1, this, Parameters.defaultFuelLevel, "Second"),3);
 

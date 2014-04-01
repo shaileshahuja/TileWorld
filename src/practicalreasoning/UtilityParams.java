@@ -41,9 +41,9 @@ public class UtilityParams {
 	public static final String PICKUP_ZERO_TILES = "pickup0";
 	public static final String PICKUP_ONE_TILES = "pickup1";
 	public static final String PICKUP_TWO_TILES = "pickup2";
-	public static final String PUTDOWN_ONE_HOLES = "putdown1";
-	public static final String PUTDOWN_TWO_HOLES = "putdown2";
-	public static final String PUTDOWN_THREE_HOLES = "putdown3";
+	public static final String PUTDOWN_ONE_TILE = "putdown1";
+	public static final String PUTDOWN_TWO_TILES = "putdown2";
+	public static final String PUTDOWN_THREE_TILES = "putdown3";
 	
 	/**
 	 * Integer range 1 to 20
@@ -79,9 +79,9 @@ public class UtilityParams {
 		params.put(PICKUP_ZERO_TILES, 1.0);
 		params.put(PICKUP_ONE_TILES, 0.66);
 		params.put(PICKUP_TWO_TILES, 0.33);
-		params.put(PUTDOWN_ONE_HOLES, 0.33);
-		params.put(PUTDOWN_TWO_HOLES, 0.66);
-		params.put(PUTDOWN_THREE_HOLES, 1.0);
+		params.put(PUTDOWN_ONE_TILE, 0.33);
+		params.put(PUTDOWN_TWO_TILES, 0.66);
+		params.put(PUTDOWN_THREE_TILES, 1.0);
 		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
 		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
 		params.put(DECAY_MEMORY_AFTER, 50.0);

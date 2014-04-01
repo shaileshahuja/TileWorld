@@ -274,11 +274,11 @@ public class UtilityAgent2 extends TWAgent{
 		switch(numberOfCarriedTiles())
 		{
 		case 3:
-			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_THREE_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_THREE_TILES);
 		case 2:
-			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_TWO_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_TWO_TILES);
 		case 1:
-			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_ONE_HOLES);
+			return holes.peek().getUtility() * parameters.get(UtilityParams.PUTDOWN_ONE_TILE);
 		default:
 			return 0;
 		}

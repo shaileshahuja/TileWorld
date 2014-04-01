@@ -70,7 +70,7 @@ public class TWObject extends TWEntity implements Comparable<TWObject>{
 
 	@Override
 	public int compareTo(TWObject o) {
-		return this.utility.compareTo(o.utility);
+		return o.utility.compareTo(this.utility);
 	}
 
 	public TWPath getPathTo() {

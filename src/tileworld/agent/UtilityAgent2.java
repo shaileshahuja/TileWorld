@@ -7,6 +7,7 @@
 
 package tileworld.agent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -186,54 +187,62 @@ public class UtilityAgent2 extends TWAgent{
 		int x = getEnvironment().getxDimension();
 		int y = getEnvironment().getyDimension();
 		Double[][] utilities = new Double[x][y];
+		ArrayList<Int2D> targets = new ArrayList<Int2D>();
 		int maxDistance = x + y;
 		for(int i = 0; i < x; i++)
 		{
 			for(int j = 0; j < y; j++)
 			{
-				TWAgentPercept percept = getMemory().getPerceptAt(i, j);
-				if(percept == null || percept.getO() instanceof TWObstacle)
+				TWObject currObj = (TWObject) getMemory().getObjectAt(i, j);
+				if(currObj == null || currObj instanceof TWObstacle)
 					continue;
-				double distance = getDistanceTo(percept.getO());		
-				double howOld = getEnvironment().schedule.getTime() - percept.getT();
+				double time = getMemory().getPerceptAt(i, j).getT();
+				targets.add(new Int2D(i, j));
+				double distance = getDistanceTo(currObj);		
+				double howOld = getEnvironment().schedule.getTime() - time;
 				double decayMultiplier = normalDistribution(1, 0, parameters.get(UtilityParams.DEVIATION_MEM_DECAY), howOld);
-				if(percept.getO() instanceof TWTile)
+				if(currObj instanceof TWTile)
 					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_TILES), (distance/maxDistance)) * decayMultiplier;
-				if(percept.getO() instanceof TWHole)
+				if(currObj instanceof TWHole)
 					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_HOLES), (distance/maxDistance)) * decayMultiplier;
+				currObj.setUtility(utilities[i][j]); //maintain a copy of utility
 			}
 		}
 		int xSearchLimit = parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X).intValue();
 		int ySearchLimit = parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y).intValue();
-		for(int i = 0; i < x; i++)
+		for(Int2D target: targets)
 		{
-			for(int j = 0; j < y; j++)
+			int i = target.x;
+			int j = target.y;
+			TWObject currObj = (TWObject) getMemory().getObjectAt(i, j);
+			currObj.setPathTo(pathGenerator.findPath(this.x, this.y, i, j, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()));				
+			if(currObj.getPathTo() == null)
+				continue;
+			
+			// search nearby instead of searching the entire target array
+			for(int k = i - xSearchLimit; k < i + xSearchLimit; k++)
 			{
-				if(utilities[i][j] == null)
-					continue;
-				TWObject currObj = (TWObject) getMemory().getObjectAt(i, j);
-				currObj.setPathTo(pathGenerator.findPath(this.x, this.y, i, j, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()));				
-				if(currObj.getPathTo() == null)
-					continue;
-				for(int k = i - xSearchLimit; k < i + xSearchLimit; k++)
+				for(int l = j - ySearchLimit; l < j + ySearchLimit; l++)
 				{
-					for(int l = j - ySearchLimit; l < j + ySearchLimit; l++)
-					{
-						if(!getEnvironment().isValidLocation(k, l) || utilities[k][l] == null)
-							continue;
-						double distance = getEnvironment().getDistance(i, j, k, l);
-						double neightbourUtility = normalDistribution(utilities[k][l], 0, parameters.get(UtilityParams.DEVIATION_NEIGHBOUR), distance / maxDistance);
-						utilities[i][j] = combineUtilities(utilities[i][j], neightbourUtility);
-					}
+					if((i == k && j == l) || !getEnvironment().isValidLocation(k, l) || utilities[k][l] == null)
+						continue;
+					double distance = getEnvironment().getDistance(i, j, k, l);
+					
+					//use utility from the unmodified utility array
+					double neightbourUtility = normalDistribution(utilities[k][l], 0, parameters.get(UtilityParams.DEVIATION_NEIGHBOUR), distance / maxDistance);
+					
+					//update the object utility
+					currObj.setUtility(combineUtilities(currObj.getUtility(), neightbourUtility));
 				}
-				double pathLengthAdjustment = getDistanceTo(currObj) / currObj.getPathTo().size();
-				currObj.setUtility(utilities[i][j] * pathLengthAdjustment);
-				if(currObj instanceof TWTile)
-					tiles.add((TWTile) currObj);
-				else
-					holes.add((TWHole) currObj);
-
 			}
+			
+			//add adjustment for the expected path length
+			double pathLengthAdjustment = getDistanceTo(currObj) / currObj.getPathTo().size();
+			currObj.setUtility(currObj.getUtility() * pathLengthAdjustment);
+			if(currObj instanceof TWTile)
+				tiles.add((TWTile) currObj);
+			else
+				holes.add((TWHole) currObj);
 		}
 	}
 

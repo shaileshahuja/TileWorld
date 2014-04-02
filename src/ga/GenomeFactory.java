@@ -9,8 +9,7 @@
 package ga;
 import java.util.Random; // even the uncommons Math random number generators extend java.util.Random
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
-
-
+import practicalreasoning.UtilityParams;
 /**
  *
  * @author Prerna
@@ -28,19 +27,22 @@ public class GenomeFactory extends AbstractCandidateFactory <Genome> {
         }
     }    
     private Genome randGenome(Genome g, Random rng){
-        g.setDoubleVal(Genome.RATIO_BUFFER, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.DEVIATION_TILES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.DEVIATION_HOLES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.DEVIATION_MEM_DECAY, (double)(1+rng.nextInt(51-1))); //0+1 to 49+1 = 1 to 50 generated 
-        g.setDoubleVal(Genome.DEVIATION_NEIGHBOUR, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PICKUP_ZERO_TILES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PICKUP_ONE_TILES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PICKUP_TWO_TILES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PUTDOWN_ONE_HOLES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PUTDOWN_TWO_HOLES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.PUTDOWN_THREE_HOLES, 0 + (1 - 0) * rng.nextDouble());
-        g.setDoubleVal(Genome.NEIGHBOUR_SEARCH_LIMIT_X, (double)(1+rng.nextInt(21-1))); //0+1 to 19+1 = 1 to 20 generated
-        g.setDoubleVal(Genome.NEIGHBOUR_SEARCH_LIMIT_Y, (double)(1+rng.nextInt(21-1))); //0+1 to 19+1 = 1 to 20 generated
+        g.setDoubleVal(UtilityParams.BUFFER_RATIO, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.DEVIATION_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.DEVIATION_HOLES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.DEVIATION_MEM_DECAY, (double)(1+rng.nextInt(101-1))); //0+1 to 99+1 = 1 to 100 generated 
+        g.setDoubleVal(UtilityParams.DEVIATION_NEIGHBOUR, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.WEIGHT_COMBINATION, (double)(1+rng.nextInt(21-1)));
+        g.setDoubleVal(UtilityParams.PICKUP_ZERO_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.PICKUP_ONE_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.PICKUP_TWO_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.PUTDOWN_ONE_TILE, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.PUTDOWN_TWO_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.PUTDOWN_THREE_TILES, 0 + (1 - 0) * rng.nextDouble());
+        g.setDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, (double)(1+rng.nextInt(21-1))); //0+1 to 19+1 = 1 to 20 generated
+        g.setDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, (double)(1+rng.nextInt(21-1))); //0+1 to 19+1 = 1 to 20 generated
+        g.setDoubleVal(UtilityParams.DECAY_MEMORY_AFTER, (double)(1+rng.nextInt(501-1)));
+        g.setDoubleVal(UtilityParams.THRESHOLD_EXPLORE, (double)(1+rng.nextInt(101-1)));
         return g;
     }
 }

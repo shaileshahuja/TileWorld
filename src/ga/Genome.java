@@ -6,7 +6,7 @@
 
 package ga;
 import java.util.HashMap;
-
+import practicalreasoning.UtilityParams;
 /**
  *
  * @author Prerna
@@ -14,49 +14,40 @@ import java.util.HashMap;
 public class Genome {
     public HashMap<String, Double> params = new HashMap<String, Double>();
     
-    public static final String RATIO_BUFFER = "bufferRatio";
-    public static final String DEVIATION_TILES = "deviationTiles";
-    public static final String DEVIATION_HOLES = "deviationHoles";
-    public static final String DEVIATION_MEM_DECAY = "deviationMemoryDecay";
-    public static final String DEVIATION_NEIGHBOUR = "deviationNeighbour";
-    public static final String PICKUP_ZERO_TILES = "pickup0";
-    public static final String PICKUP_ONE_TILES = "pickup1";
-    public static final String PICKUP_TWO_TILES = "pickup2";
-    public static final String PUTDOWN_ONE_HOLES = "putdown1";
-    public static final String PUTDOWN_TWO_HOLES = "putdown2";
-    public static final String PUTDOWN_THREE_HOLES = "putdown3";
-    public static final String NEIGHBOUR_SEARCH_LIMIT_X = "XSearch";
-    public static final String NEIGHBOUR_SEARCH_LIMIT_Y = "YSearch";
-    
-    public static final String index0 = RATIO_BUFFER;
-    public static final String index1 = DEVIATION_TILES;
-    public static final String index2 = DEVIATION_HOLES;
-    public static final String index3 = DEVIATION_MEM_DECAY;
-    public static final String index4 = DEVIATION_NEIGHBOUR;
-    public static final String index5 = PICKUP_ZERO_TILES;
-    public static final String index6 = PICKUP_ONE_TILES;
-    public static final String index7 = PICKUP_TWO_TILES;
-    public static final String index8 = PUTDOWN_ONE_HOLES;
-    public static final String index9 = PUTDOWN_TWO_HOLES;
-    public static final String index10 = PUTDOWN_THREE_HOLES;
-    public static final String index11 = NEIGHBOUR_SEARCH_LIMIT_X;
-    public static final String index12 = NEIGHBOUR_SEARCH_LIMIT_Y;
-    
+    public static final String index0 = UtilityParams.BUFFER_RATIO;
+    public static final String index1 = UtilityParams.DEVIATION_TILES;
+    public static final String index2 = UtilityParams.DEVIATION_HOLES;
+    public static final String index3 = UtilityParams.DEVIATION_MEM_DECAY;
+    public static final String index4 = UtilityParams.DEVIATION_NEIGHBOUR;
+    public static final String index5 = UtilityParams.WEIGHT_COMBINATION;
+    public static final String index6 = UtilityParams.PICKUP_ZERO_TILES;
+    public static final String index7 = UtilityParams.PICKUP_ONE_TILES;
+    public static final String index8 = UtilityParams.PICKUP_TWO_TILES;
+    public static final String index9 = UtilityParams.PUTDOWN_ONE_TILE;
+    public static final String index10 = UtilityParams.PUTDOWN_TWO_TILES;
+    public static final String index11 = UtilityParams.PUTDOWN_THREE_TILES;
+    public static final String index12 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X;
+    public static final String index13 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y;
+    public static final String index14 = UtilityParams.DECAY_MEMORY_AFTER;
+    public static final String index15 = UtilityParams.THRESHOLD_EXPLORE;
     
     public Genome (){
-        params.put(RATIO_BUFFER, 0.1); // 0-1 (practically, should not be above 0.5)
-	params.put(DEVIATION_TILES, 0.3); // 0-1
-	params.put(DEVIATION_HOLES, 0.3); // 0-1
-	params.put(DEVIATION_MEM_DECAY, 15.0); // 1-50 or 100
-	params.put(DEVIATION_NEIGHBOUR, 0.3); // 0-1
-	params.put(PICKUP_ZERO_TILES, 1.0); // 0-1
-	params.put(PICKUP_ONE_TILES, 0.66); // 0-1
-	params.put(PICKUP_TWO_TILES, 0.33); // 0-1
-	params.put(PUTDOWN_ONE_HOLES, 0.33); // 0-1
-	params.put(PUTDOWN_TWO_HOLES, 0.66); // 0-1
-	params.put(PUTDOWN_THREE_HOLES, 1.0); // 0-1
-	params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0); // 1 to 20 or env width (int)
-	params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0); // 1 to 20 or env height (int)
+    	params.put(UtilityParams.BUFFER_RATIO, 0.1);
+		params.put(UtilityParams.DEVIATION_TILES, 0.3);
+		params.put(UtilityParams.DEVIATION_HOLES, 0.3);
+		params.put(UtilityParams.DEVIATION_MEM_DECAY, 15.0);
+		params.put(UtilityParams.DEVIATION_NEIGHBOUR, 0.3);
+		params.put(UtilityParams.WEIGHT_COMBINATION, 5.0);
+		params.put(UtilityParams.PICKUP_ZERO_TILES, 1.0);
+		params.put(UtilityParams.PICKUP_ONE_TILES, 0.66);
+		params.put(UtilityParams.PICKUP_TWO_TILES, 0.33);
+		params.put(UtilityParams.PUTDOWN_ONE_TILE, 0.33);
+		params.put(UtilityParams.PUTDOWN_TWO_TILES, 0.66);
+		params.put(UtilityParams.PUTDOWN_THREE_TILES, 1.0);
+		params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(UtilityParams.DECAY_MEMORY_AFTER, 50.0);
+		params.put(UtilityParams.THRESHOLD_EXPLORE, 10.0);
     }
     public double getDoubleVal(String str){
         return (double) params.get(str);
@@ -72,19 +63,22 @@ public class Genome {
     }
     public void clone(Genome g){
         //params = (HashMap) g.getAllParams().clone(); // this gives a shallow copy
-        params.put(RATIO_BUFFER, g.getDoubleVal(RATIO_BUFFER)); // 0-1 (practically, should not be above 0.5)
-	params.put(DEVIATION_TILES, g.getDoubleVal(DEVIATION_TILES)); // 0-1
-	params.put(DEVIATION_HOLES, g.getDoubleVal(DEVIATION_HOLES)); // 0-1
-	params.put(DEVIATION_MEM_DECAY, g.getDoubleVal(DEVIATION_MEM_DECAY)); // 1-50 or 100
-	params.put(DEVIATION_NEIGHBOUR, g.getDoubleVal(DEVIATION_NEIGHBOUR)); // 0-1
-	params.put(PICKUP_ZERO_TILES, g.getDoubleVal(PICKUP_ZERO_TILES)); // 0-1
-	params.put(PICKUP_ONE_TILES, g.getDoubleVal(PICKUP_ONE_TILES)); // 0-1
-	params.put(PICKUP_TWO_TILES, g.getDoubleVal(PICKUP_TWO_TILES)); // 0-1
-	params.put(PUTDOWN_ONE_HOLES, g.getDoubleVal(PUTDOWN_ONE_HOLES)); // 0-1
-	params.put(PUTDOWN_TWO_HOLES, g.getDoubleVal(PUTDOWN_TWO_HOLES)); // 0-1
-	params.put(PUTDOWN_THREE_HOLES, g.getDoubleVal(PUTDOWN_THREE_HOLES)); // 0-1
-	params.put(NEIGHBOUR_SEARCH_LIMIT_X, g.getDoubleVal(NEIGHBOUR_SEARCH_LIMIT_X)); // 1 to 20 or env width (int)
-	params.put(NEIGHBOUR_SEARCH_LIMIT_Y, g.getDoubleVal(NEIGHBOUR_SEARCH_LIMIT_Y)); // 1 to 20 or env height (int)
+        params.put(UtilityParams.BUFFER_RATIO, g.getDoubleVal(UtilityParams.BUFFER_RATIO)); // 0-1 (practically, should not be above 0.5)
+        params.put(UtilityParams.DEVIATION_TILES, g.getDoubleVal(UtilityParams.DEVIATION_TILES)); // 0-1
+        params.put(UtilityParams.DEVIATION_HOLES, g.getDoubleVal(UtilityParams.DEVIATION_HOLES)); // 0-1
+        params.put(UtilityParams.DEVIATION_MEM_DECAY, g.getDoubleVal(UtilityParams.DEVIATION_MEM_DECAY)); // 1-50 or 100
+        params.put(UtilityParams.DEVIATION_NEIGHBOUR, g.getDoubleVal(UtilityParams.DEVIATION_NEIGHBOUR)); // 0-1
+        params.put(UtilityParams.WEIGHT_COMBINATION, g.getDoubleVal(UtilityParams.WEIGHT_COMBINATION));
+        params.put(UtilityParams.PICKUP_ZERO_TILES, g.getDoubleVal(UtilityParams.PICKUP_ZERO_TILES)); // 0-1
+        params.put(UtilityParams.PICKUP_ONE_TILES, g.getDoubleVal(UtilityParams.PICKUP_ONE_TILES)); // 0-1
+        params.put(UtilityParams.PICKUP_TWO_TILES, g.getDoubleVal(UtilityParams.PICKUP_TWO_TILES)); // 0-1
+        params.put(UtilityParams.PUTDOWN_ONE_TILE, g.getDoubleVal(UtilityParams.PUTDOWN_ONE_TILE)); // 0-1
+        params.put(UtilityParams.PUTDOWN_TWO_TILES, g.getDoubleVal(UtilityParams.PUTDOWN_TWO_TILES)); // 0-1
+        params.put(UtilityParams.PUTDOWN_THREE_TILES, g.getDoubleVal(UtilityParams.PUTDOWN_THREE_TILES)); // 0-1
+        params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, g.getDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X)); // 1 to 20 or env width (int)
+        params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, g.getDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y)); // 1 to 20 or env height (int)
+        params.put(UtilityParams.DECAY_MEMORY_AFTER, g.getDoubleVal(UtilityParams.DECAY_MEMORY_AFTER)); // 1 to 20 or env width (int)
+        params.put(UtilityParams.THRESHOLD_EXPLORE, g.getDoubleVal(UtilityParams.THRESHOLD_EXPLORE)); // 1 to 20 or env height (int)
     }
     public static final String getParamStr(int i){
         String paramStr="";
@@ -102,6 +96,9 @@ public class Genome {
             case 10: paramStr=index10; break;
             case 11: paramStr=index11; break;
             case 12: paramStr=index12; break;
+            case 13: paramStr=index13; break;
+            case 14: paramStr=index14; break;
+            case 15: paramStr=index15; break;
             default: paramStr=""; break;
         }
         return paramStr;

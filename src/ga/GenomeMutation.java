@@ -7,11 +7,11 @@
 package ga;
 import java.util.*;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
+import practicalreasoning.UtilityParams;
 /**
  *
  * @author Prerna
  */
-
 public class GenomeMutation implements EvolutionaryOperator<Genome> {
     private HashMap<String, Double> upperrange = new HashMap<String, Double>();
     public HashMap<String, Double> lowerrange = new HashMap<String, Double>();
@@ -21,39 +21,46 @@ public class GenomeMutation implements EvolutionaryOperator<Genome> {
     private int numOfParams;
     
     public GenomeMutation(){
-        upperrange.put(Genome.RATIO_BUFFER, 1.0); // 0-1 (practically, should not be above 0.5)
-	upperrange.put(Genome.DEVIATION_TILES, 1.0); // 0-1
-	upperrange.put(Genome.DEVIATION_HOLES, 1.0); // 0-1
-	upperrange.put(Genome.DEVIATION_MEM_DECAY, 50.0); // 1-50 or 100
-	upperrange.put(Genome.DEVIATION_NEIGHBOUR, 1.0); // 0-1
-	upperrange.put(Genome.PICKUP_ZERO_TILES, 1.0); // 0-1
-	upperrange.put(Genome.PICKUP_ONE_TILES, 1.0); // 0-1
-	upperrange.put(Genome.PICKUP_TWO_TILES, 1.0); // 0-1
-	upperrange.put(Genome.PUTDOWN_ONE_HOLES, 1.0); // 0-1
-	upperrange.put(Genome.PUTDOWN_TWO_HOLES, 1.0); // 0-1
-	upperrange.put(Genome.PUTDOWN_THREE_HOLES, 1.0); // 0-1
-	upperrange.put(Genome.NEIGHBOUR_SEARCH_LIMIT_X, 20.0); // 1 to 20 or env width (int)
-	upperrange.put(Genome.NEIGHBOUR_SEARCH_LIMIT_Y, 20.0); // 1 to 20 or env height (int)
+        upperrange.put(UtilityParams.BUFFER_RATIO, 0.4); // 0-1 (practically, should not be above 0.5)
+        upperrange.put(UtilityParams.DEVIATION_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.DEVIATION_HOLES, 1.0); // 0-1
+        upperrange.put(UtilityParams.DEVIATION_MEM_DECAY, 100.0); // 1-50 or 100
+        upperrange.put(UtilityParams.DEVIATION_NEIGHBOUR, 1.0); // 0-1
+        upperrange.put(UtilityParams.WEIGHT_COMBINATION, 20.0); // 0-1
+        upperrange.put(UtilityParams.PICKUP_ZERO_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.PICKUP_ONE_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.PICKUP_TWO_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.PUTDOWN_ONE_TILE, 1.0); // 0-1
+        upperrange.put(UtilityParams.PUTDOWN_TWO_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.PUTDOWN_THREE_TILES, 1.0); // 0-1
+        upperrange.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, 20.0); // 1 to 20 or env width (int)
+        upperrange.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, 20.0); // 1 to 20 or env height (int)
+        upperrange.put(UtilityParams.DECAY_MEMORY_AFTER, 500.0); // 500 for now, else 5000, depends on time steps
+        upperrange.put(UtilityParams.THRESHOLD_EXPLORE, 100.0); 
         
-        lowerrange.put(Genome.RATIO_BUFFER, 0.0); // 0-1 (practically, should not be above 0.5)
-	lowerrange.put(Genome.DEVIATION_TILES, 0.0); // 0-1
-	lowerrange.put(Genome.DEVIATION_HOLES, 0.0); // 0-1
-	lowerrange.put(Genome.DEVIATION_MEM_DECAY, 1.0); // 1-50 or 100
-	lowerrange.put(Genome.DEVIATION_NEIGHBOUR, 0.0); // 0-1
-	lowerrange.put(Genome.PICKUP_ZERO_TILES, 0.0); // 0-1
-	lowerrange.put(Genome.PICKUP_ONE_TILES, 0.0); // 0-1
-	lowerrange.put(Genome.PICKUP_TWO_TILES, 0.0); // 0-1
-	lowerrange.put(Genome.PUTDOWN_ONE_HOLES, 0.0); // 0-1
-	lowerrange.put(Genome.PUTDOWN_TWO_HOLES, 0.0); // 0-1
-	lowerrange.put(Genome.PUTDOWN_THREE_HOLES, 0.0); // 0-1
-	lowerrange.put(Genome.NEIGHBOUR_SEARCH_LIMIT_X, 1.0); // 1 to 20 or env width (int)
-	lowerrange.put(Genome.NEIGHBOUR_SEARCH_LIMIT_Y, 1.0); // 1 to 20 or env height (int)
+        lowerrange.put(UtilityParams.BUFFER_RATIO, 0.0); // 0-1 (practically, should not be above 0.5)
+        lowerrange.put(UtilityParams.DEVIATION_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.DEVIATION_HOLES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.DEVIATION_MEM_DECAY, 0.0); // 1-50 or 100
+        lowerrange.put(UtilityParams.DEVIATION_NEIGHBOUR, 0.0); // 0-1
+        lowerrange.put(UtilityParams.WEIGHT_COMBINATION, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PICKUP_ZERO_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PICKUP_ONE_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PICKUP_TWO_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PUTDOWN_ONE_TILE, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PUTDOWN_TWO_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.PUTDOWN_THREE_TILES, 0.0); // 0-1
+        lowerrange.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, 1.0); // 1 to 20 or env width (int)
+        lowerrange.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, 1.0); // 1 to 20 or env height (int)
+        lowerrange.put(UtilityParams.DECAY_MEMORY_AFTER, 1.0); // 500 for now, else 5000, depends on time steps
+        lowerrange.put(UtilityParams.THRESHOLD_EXPLORE, 0.0); 
         
         numOfParams = upperrange.size();
     }
     
     @Override
     public List<Genome> apply(List<Genome> selectedCandidates, Random rng) {
+    	System.out.println("Applying Mutation");
         for(int i=0; i<selectedCandidates.size(); i++){
             double chance = rng.nextDouble();
             if(chance<=probability){
@@ -70,13 +77,16 @@ public class GenomeMutation implements EvolutionaryOperator<Genome> {
             String paramToMutate = Genome.getParamStr(randI);
             double currVal = g.getDoubleVal(paramToMutate);
             double upperVal = upperrange.get(paramToMutate);
+            //System.out.println("Mutating cand-1 "+paramToMutate);
             double lowerVal = lowerrange.get(paramToMutate);
+            //System.out.println("Mutating cand-2");
             double newVal = generateNewVal(currVal, upperVal, lowerVal, rng);
             g.setDoubleVal(paramToMutate, newVal);
         }
         return g;
     } 
     private double generateNewVal(double curr, double upper, double lower, Random rng){
+    	System.out.println("Generating rand val for mutation");
         int addOrNot = rng.nextInt(2);
         boolean add=true;
         if(addOrNot==0){add=false;}
@@ -102,10 +112,3 @@ public class GenomeMutation implements EvolutionaryOperator<Genome> {
         return newVal;
     }
 }
-    
-    
-    
-    
-    
-    
-    

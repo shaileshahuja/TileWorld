@@ -30,7 +30,6 @@ public class GenomeCrossover extends AbstractCrossover<Genome>{
         super(crossoverPointsVariable);
     }
     
-    
     @Override
     protected List<Genome> mate(Genome parent1, Genome parent2, int numberOfCrossoverPoints, Random rng)
     {

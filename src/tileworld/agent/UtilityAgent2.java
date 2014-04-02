@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Random;
+
+import org.uncommons.maths.random.ContinuousUniformGenerator;
 
 import practicalreasoning.Intention;
 import practicalreasoning.IntentionType;
@@ -53,7 +57,8 @@ public class UtilityAgent2 extends TWAgent{
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
 	private TWRefuelPathGenerator fuelPathGen;
-	public static boolean DEBUG = false;
+	private LinkedList<Int2D> locationSnaps;
+	private ArrayList<Int2D> corners;
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
 	public UtilityAgent2(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
@@ -62,9 +67,17 @@ public class UtilityAgent2 extends TWAgent{
 		fuelPathGen = new TWRefuelPathGenerator(this);
 		this.parameters = parameters;
 		this.name = name;
+		this.locationSnaps = new LinkedList<Int2D>();
+		this.corners = new ArrayList<Int2D>(4);
+		corners.add(new Int2D(Parameters.defaultSensorRange, Parameters.defaultSensorRange));
+		corners.add(new Int2D(Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
+		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, Parameters.defaultSensorRange));
+		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
+		
 	}
 
 	protected TWThought think() {
+		
 		//High prio reactive
 		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
@@ -105,6 +118,16 @@ public class UtilityAgent2 extends TWAgent{
 			System.out.println(currIntention);
 			System.out.println(currentPlan.peek());
 		}
+		
+
+		//store past locations
+		if(getEnvironment().schedule.getSteps() % parameters.get(UtilityParams.GAP_LOCATION_SNAP).intValue() == 0)
+		{
+			locationSnaps.add(new Int2D(x, y));
+			if(locationSnaps.size() > 5)
+				locationSnaps.remove();
+		}
+		
 		return currentPlan.next();
 	}
 
@@ -151,6 +174,7 @@ public class UtilityAgent2 extends TWAgent{
 				break;			
 			}
 		}  catch (CellBlockedException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -165,7 +189,10 @@ public class UtilityAgent2 extends TWAgent{
 	}
 
 	private boolean impossible(TWPlan currentPlan) {
-		return (currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext());
+		if (currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext())
+			return true;
+		TWDirection next = currentPlan.peek().getDirection();
+		return getMemory().isCellBlocked(x + next.dx, y + next.dy, -1);
 	}
 
 	public double fueling()
@@ -305,7 +332,7 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if (explore)
 		{
-			Int2D location = randomLocation();
+			Int2D location = getExploreLocation();
 			return new Intention(IntentionType.EXPLORE, location);
 		}
 
@@ -336,8 +363,8 @@ public class UtilityAgent2 extends TWAgent{
 		switch(intention.getIntentionType())
 		{
 		case EXPLORE:
-			//TODO: change explore path generator to something cooler
-			path = pathGenerator.findPath(x, y, intention.getLocation().x, intention.getLocation().y, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue());
+			// we pass 1 as decay, because we only want to consider the obstacles in the current sensor range
+			path = pathGenerator.findPath(x, y, intention.getLocation().x, intention.getLocation().y, 1);
 			break;
 		case FILLHOLE:
 			path = holes.peek().getPathTo();
@@ -349,7 +376,7 @@ public class UtilityAgent2 extends TWAgent{
 			path = fuelPathGen.generateRefuelPath();
 			break;
 		}
-		if(path == null)
+		if(path == null || !path.hasNext())
 		{
 			thoughts.add(new TWThought(TWAction.MOVE, findReactiveDirection(intention.getLocation().getX(), intention.getLocation().getY())));
 		}
@@ -362,7 +389,78 @@ public class UtilityAgent2 extends TWAgent{
 	}
 
 
-	private Int2D randomLocation() {
+	private Int2D getExploreLocation() {
+		if(locationSnaps.size() <= 1)
+			return getRandomLocation();
+		
+		//return end location in a straight line
+		Int2D cur = new Int2D(x, y);
+		Int2D prev = locationSnaps.getLast();
+		Int2D prev2 = locationSnaps.get(locationSnaps.size() - 2);
+		if(getEnvironment().getDistance(x, y, prev.x, prev.y) < parameters.get(UtilityParams.GAP_LOCATION_SNAP) / 2)
+		{
+			Int2D location1 = getLocationByDirection(cur, prev);
+			if(location1 != null)
+				return location1;
+		}
+		else
+		{
+			Int2D location2 = getLocationByDirection(prev, prev2);
+			if(location2 != null)
+				return location2;
+		}
+			
+		//if we are already at the end			
+		return getRandomLocation();
+//		Int2D[] from = new Int2D[locationSnaps.size() + 1];
+//		from = locationSnaps.toArray(from);
+//		from[locationSnaps.size()] = new Int2D(x, y);
+//		return getFarthestCorner(from);
+	}
+
+	private Int2D getLocationByDirection(Int2D cur, Int2D prev) {
+		double speedX = cur.x - prev.x;
+		double speedY = cur.y - prev.y;
+		int endX, endY;
+		if(speedX >= 0)
+			endX = getEnvironment().getxDimension() - Parameters.defaultSensorRange;
+		else
+			endX = Parameters.defaultSensorRange;
+		if(speedY >= 0)
+			endY = getEnvironment().getyDimension() - Parameters.defaultSensorRange;
+		else
+			endY = Parameters.defaultSensorRange;
+		
+		double timeX = (endX - cur.x) / speedX;
+		double timeY = (endY - cur.y) / speedY;
+		if(timeX != 0 && timeY != 0 && endX - cur.x > 2 && endY - cur.y > 2)
+		{
+			if(timeX <= timeY)
+				return new Int2D(endX, cur.y + (int)Math.round(speedY * timeX));
+			return new Int2D(cur.x + (int)Math.round(speedX * timeY), endY);
+		}
+		return null;
+	}
+
+	private Int2D getFarthestCorner(Int2D[] from) {
+		Int2D farthest = null;
+		int maxD = 0;
+		for(Int2D corner: corners)
+		{
+			int distance = 0;
+			for(Int2D point: from)
+				distance += getEnvironment().getDistance(corner.x, corner.y, point.x, point.y);
+			if(distance > maxD)
+			{
+				farthest = corner;
+				maxD = distance;
+			}
+		}
+		return farthest;
+	}
+
+	private Int2D getRandomLocation()
+	{
 		Int2D location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
 				(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
 		while(getMemory().isCellBlocked(location.x, location.y, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()))
@@ -370,7 +468,6 @@ public class UtilityAgent2 extends TWAgent{
 					(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
 		return location;
 	}
-
 	public TWDirection findReactiveDirection(int tx, int ty) {
 		int sx = x;
 		int sy = y;

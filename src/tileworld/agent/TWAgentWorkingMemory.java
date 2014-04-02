@@ -334,7 +334,7 @@ public class TWAgentWorkingMemory {
         if (objects[tx][ty] == null) {
             return false;
         }
-        if(decay >= 0 && me.getEnvironment().schedule.getTime() - objects[tx][ty].getT() > decay)
+        if(decay >= 0 && me.getEnvironment().schedule.getTime() - objects[tx][ty].getT() >= decay)
         	return false;
         TWEntity e = (TWEntity) objects[tx][ty].getO();
         //is it an obstacle?

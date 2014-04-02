@@ -85,7 +85,6 @@ public class TWEnvironment extends SimState implements Steppable {
                 holes, this.random, new TWHole(), this);
         this.obstacleCreator = new TWObjectCreator<TWObstacle>(Parameters.obstacleMean,
                 Parameters.obstacleDev, obstacles, this.random, new TWObstacle(), this);
-        this.agents = new ArrayList<TWAgent>();
         parameters = new ArrayList<HashMap<String,Double>>();
         parameters.add(UtilityParams.defaultParams());
         parameters.add(UtilityParams.defaultParams());
@@ -126,6 +125,7 @@ public class TWEnvironment extends SimState implements Steppable {
 
         schedule.scheduleRepeating(this, 1, 1.0);
 
+        this.agents = new ArrayList<TWAgent>();
         
         agents.add(new UtilityAgent2("First", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(0)));
         agents.add(new UtilityAgent2("Second", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(1)));

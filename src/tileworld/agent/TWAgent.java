@@ -35,6 +35,7 @@ public abstract class TWAgent extends TWEntity implements Steppable {
 
     protected int score;
 
+	public static boolean DEBUG = true;
     public int getScore() {
         return score;
     }
@@ -122,7 +123,8 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         //below is not strictly necessary as the location will be overwritten with agent
         //but for clarity include this here.
         this.getEnvironment().getObjectGrid().set(tile.getX(), tile.getY(), null);
-        System.out.println("Tile picked at " + x + " " + y);
+        if(DEBUG)
+        	System.out.println("Tile picked at " + x + " " + y);
     }
 
     /**
@@ -137,8 +139,11 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         this.getEnvironment().getObjectGrid().set(hole.getX(), hole.getY(), null);
         this.score++;
         
-        //System.out.println("Tile put at " + x + " " + y);
-		//System.out.println("Score: " + this.score);
+        if(DEBUG)
+        {
+        	System.out.println("Tile put at " + x + " " + y);
+        	System.out.println("Score: " + this.score);
+        }
     }
 
     /**

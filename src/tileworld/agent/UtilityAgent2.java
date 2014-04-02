@@ -59,7 +59,6 @@ public class UtilityAgent2 extends TWAgent{
 		super(xpos,ypos,env,fuelLevel);
 		pathGenerator = new AstarPathGenerator(env, this, Integer.MAX_VALUE);
 		fuelPathGen = new TWRefuelPathGenerator(this);
-		//reactivePathGen = new ReactivePathGenerator();
 		this.parameters = parameters;
 		this.name = name;
 	}

@@ -89,4 +89,25 @@ public class UtilityParams {
 		return params;
 	}
 	
+	public static HashMap<String, Double> defaultParams2()
+	{
+		HashMap<String, Double> params = new HashMap<String, Double>();
+		params.put(BUFFER_RATIO, 0.1);
+		params.put(DEVIATION_TILES, 0.3);
+		params.put(DEVIATION_HOLES, 0.3);
+		params.put(DEVIATION_MEM_DECAY, 15.0);
+		params.put(DEVIATION_NEIGHBOUR, 0.3);
+		params.put(WEIGHT_COMBINATION, 5.0);
+		params.put(PICKUP_ZERO_TILES, 1.0);
+		params.put(PICKUP_ONE_TILES, 1.0);
+		params.put(PICKUP_TWO_TILES, 1.0);
+		params.put(PUTDOWN_ONE_TILE, 1.0);
+		params.put(PUTDOWN_TWO_TILES, 1.0);
+		params.put(PUTDOWN_THREE_TILES, 1.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(DECAY_MEMORY_AFTER, 50.0);
+		params.put(THRESHOLD_EXPLORE, 10.0);
+		return params;
+	}
 }

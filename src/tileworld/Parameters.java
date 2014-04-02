@@ -35,6 +35,6 @@ public class Parameters {
     public static final double tileDev = 0.05f;
     public static final double holeDev = 0.05f;
     public static final double obstacleDev = 0.05f;
-    public static final int lifeTime = 5000;
+    public static final int lifeTime = 100;
 
 }

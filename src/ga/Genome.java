@@ -42,6 +42,7 @@ public class Genome {
     public static final String index11 = NEIGHBOUR_SEARCH_LIMIT_X;
     public static final String index12 = NEIGHBOUR_SEARCH_LIMIT_Y;
     
+    
     public Genome (){
         params.put(RATIO_BUFFER, 0.1); // 0-1 (practically, should not be above 0.5)
 	params.put(DEVIATION_TILES, 0.3); // 0-1

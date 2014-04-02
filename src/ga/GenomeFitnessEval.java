@@ -43,7 +43,7 @@ private HashMap<String, Double> weightPoints = new HashMap<String, Double>();
             }
         }
         tw.finish();
-        return tw.getScore();
+        return (tw.getScore()*1.0) / tw.getTotalHolesCreated();
     }
 
     @Override

@@ -47,6 +47,7 @@ public class TWEnvironment extends SimState implements Steppable {
     private ObjectGrid2D agentGrid;
     private ArrayList<HashMap<String,Double>> parameters;
     private ArrayList<TWAgent> agents;
+    private int totalHolesCreated = 0;
     private TWObjectCreator<TWTile> tileCreator;
     private TWObjectCreator<TWHole> holeCreator;
     private TWObjectCreator<TWObstacle> obstacleCreator;
@@ -147,7 +148,11 @@ public class TWEnvironment extends SimState implements Steppable {
         try {
 
             tiles.addAll(tileCreator.createTWObjects(time));
-            holes.addAll(holeCreator.createTWObjects(time));
+            
+            Bag bag = holeCreator.createTWObjects(time);
+            totalHolesCreated += bag.size();
+            holes.addAll(bag);
+            
             obstacles.addAll(obstacleCreator.createTWObjects(time));
         } catch (IllegalAccessException e) {
             // TODO Auto-generated catch block
@@ -368,4 +373,8 @@ public class TWEnvironment extends SimState implements Steppable {
     	return score;
     }
    
+    public int getTotalHolesCreated()
+    {
+    	return totalHolesCreated;
+    }
 }

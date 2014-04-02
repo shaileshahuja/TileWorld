@@ -53,6 +53,7 @@ public class UtilityAgent2 extends TWAgent{
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
 	private TWRefuelPathGenerator fuelPathGen;
+	public static boolean DEBUG = false;
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
 	public UtilityAgent2(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
@@ -98,9 +99,12 @@ public class UtilityAgent2 extends TWAgent{
 				currIntention = newIntention;
 			}
 		}
-		System.out.print(name + " ");
-		System.out.println(currIntention);
-		System.out.println(currentPlan.peek());
+		if(DEBUG)
+		{
+			System.out.print(name + " ");
+			System.out.println(currIntention);
+			System.out.println(currentPlan.peek());
+		}
 		return currentPlan.next();
 	}
 
@@ -159,10 +163,10 @@ public class UtilityAgent2 extends TWAgent{
 	public HashMap<String, Double> getParameters(){
 		return this.parameters;
 	}
-	
+
 	private boolean impossible(TWPlan currentPlan) {
 		return (currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext());
-		}
+	}
 
 	public double fueling()
 	{
@@ -178,7 +182,7 @@ public class UtilityAgent2 extends TWAgent{
 			return 99.99;
 		return distance / fuelLevel * 100;
 	}
-	
+
 	public void computeUtilities()
 	{	
 		this.holes = new PriorityQueue<TWHole>();
@@ -217,7 +221,7 @@ public class UtilityAgent2 extends TWAgent{
 			currObj.setPathTo(pathGenerator.findPath(this.x, this.y, i, j, parameters.get(UtilityParams.DECAY_MEMORY_AFTER).intValue()));				
 			if(currObj.getPathTo() == null)
 				continue;
-			
+
 			// search nearby instead of searching the entire target array
 			for(int k = i - xSearchLimit; k < i + xSearchLimit; k++)
 			{
@@ -226,15 +230,15 @@ public class UtilityAgent2 extends TWAgent{
 					if((i == k && j == l) || !getEnvironment().isValidLocation(k, l) || utilities[k][l] == null)
 						continue;
 					double distance = getEnvironment().getDistance(i, j, k, l);
-					
+
 					//use utility from the unmodified utility array
 					double neightbourUtility = normalDistribution(utilities[k][l], 0, parameters.get(UtilityParams.DEVIATION_NEIGHBOUR), distance / maxDistance);
-					
+
 					//update the object utility
 					currObj.setUtility(combineUtilities(currObj.getUtility(), neightbourUtility));
 				}
 			}
-			
+
 			//add adjustment for the expected path length
 			double pathLengthAdjustment = getDistanceTo(currObj) / currObj.getPathTo().size();
 			currObj.setUtility(currObj.getUtility() * pathLengthAdjustment);
@@ -291,7 +295,7 @@ public class UtilityAgent2 extends TWAgent{
 		utilities.put(IntentionType.FILLHOLE, putInHole());
 		return utilities;
 	}
-	
+
 	private Intention filter(HashMap<IntentionType, Double> utilities) {
 		boolean explore = true;
 		for(Double value: utilities.values())
@@ -321,13 +325,13 @@ public class UtilityAgent2 extends TWAgent{
 		return new Intention(IntentionType.FILLHOLE, selected.getX(),
 				selected.getY());
 	}
-	
+
 	private TWPlan plan(Intention intention) {
 		LinkedList<TWThought> thoughts = new LinkedList<TWThought>();			//
-			//
-			//This is where we should use different pathgenerators based on which intention we have.
-			//And make sure that we don't return null values.
-			//
+		//
+		//This is where we should use different pathgenerators based on which intention we have.
+		//And make sure that we don't return null values.
+		//
 		TWPath path = null;
 		switch(intention.getIntentionType())
 		{
@@ -356,8 +360,8 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		return new TWPlan(thoughts);
 	}
-	
-	
+
+
 	private Int2D randomLocation() {
 		Int2D location = getEnvironment().generateFarRandomLocation(getX(), getY(), 
 				(getEnvironment().getxDimension() + getEnvironment().getyDimension()) / 2);
@@ -396,7 +400,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(ty < sy && !getMemory().isCellBlocked(sx, sy + 1, -1))
 				return TWDirection.N;	
 		}		
-		
+
 		//give up and return any unblocked side
 		// at least one side is unblocked, as the code checks for it in the beginning
 		if(!getMemory().isCellBlocked(sx, sy + 1, -1))
@@ -409,7 +413,7 @@ public class UtilityAgent2 extends TWAgent{
 			return TWDirection.W;
 	}
 
-	
+
 	/**
 	 * Returns y value corresponding to the input x from the normal distribution function
 	 * Consider using exponential function as well.

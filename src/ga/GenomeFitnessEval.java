@@ -7,10 +7,13 @@
 package ga;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.maths.random.MersenneTwisterRNG;
+
+import sim.engine.SimState;
+import tileworld.Parameters;
+import tileworld.environment.TWEnvironment;
 import ga.Genome;
+
 import java.util.*;
-import java.util.HashMap;
-import java.util.List;
 /**
  *
  * @author Prerna
@@ -45,17 +48,32 @@ private HashMap<String, Double> weightPoints = new HashMap<String, Double>();
     @Override
     public double getFitness(Genome candidate, List<? extends Genome> population) 
     {
-        double fitness=0;
-        double total=0;
-        double den=0;
-        for(int i=0;i<weightPoints.size();i++)
-        {
-            total = total + (candidate.getDoubleVal(Genome.getParamStr(i))*weightPoints.get(Genome.getParamStr(i)));
-            den = den + weightPoints.get(Genome.getParamStr(i));
+//        double fitness=0;
+//        double total=0;
+//        double den=0;
+//        for(int i=0;i<weightPoints.size();i++)
+//        {
+//            total = total + (candidate.getDoubleVal(Genome.getParamStr(i))*weightPoints.get(Genome.getParamStr(i)));
+//            den = den + weightPoints.get(Genome.getParamStr(i));
+//        }
+//        fitness=total/den;
+//        //System.out.println("FITNESS : "+fitness);
+//        return fitness;
+    	ArrayList<HashMap<String, Double>> parameters = new ArrayList<HashMap<String,Double>>();
+    	parameters.add(candidate.params);
+    	parameters.add(candidate.params);
+    	TWEnvironment tw = new TWEnvironment(parameters);
+        tw.start();
+      
+        long steps = 0;	
+
+        while (steps < Parameters.endTime) {
+            if (!tw.schedule.step(tw)) {
+                break;
+            }
         }
-        fitness=total/den;
-        //System.out.println("FITNESS : "+fitness);
-        return fitness;
+        tw.finish();
+        return tw.getScore();
     }
 
     @Override

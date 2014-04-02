@@ -4,7 +4,13 @@
  */
 package tileworld;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import practicalreasoning.UtilityParams;
 import sim.engine.SimState;
+import tileworld.agent.TWAgent;
+import tileworld.agent.UtilityAgent2;
 import tileworld.environment.TWEnvironment;
 /**
  * TileworldMain
@@ -23,7 +29,7 @@ import tileworld.environment.TWEnvironment;
 public class TileworldMain {
 
     public static void main3(String args[]) {
-
+        
         TWEnvironment tw = new TWEnvironment(Parameters.seed);
         tw.start();
       
@@ -70,7 +76,6 @@ public class TileworldMain {
                 }
             }
         }
-
         // ...or should we start fresh?
         if (tw == null) // no checkpoint file requested
         {

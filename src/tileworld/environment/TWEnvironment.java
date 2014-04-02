@@ -3,7 +3,11 @@
  */
 package tileworld.environment;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import practicalreasoning.UtilityParams;
+import sim.app.crowd3d.Agent;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.ObjectGrid2D;
@@ -41,7 +45,8 @@ public class TWEnvironment extends SimState implements Steppable {
      */
     private ObjectGrid2D objectGrid;
     private ObjectGrid2D agentGrid;
-   
+    private ArrayList<HashMap<String,Double>> parameters;
+    private ArrayList<TWAgent> agents;
     private TWObjectCreator<TWTile> tileCreator;
     private TWObjectCreator<TWHole> holeCreator;
     private TWObjectCreator<TWObstacle> obstacleCreator;
@@ -60,9 +65,14 @@ public class TWEnvironment extends SimState implements Steppable {
     }
 
     public TWEnvironment() {
+    	
         this(Parameters.seed);
     }
-
+    
+    public TWEnvironment(ArrayList<HashMap<String,Double>> parameters) {
+        this(Parameters.seed, parameters);
+    }
+    
     public TWEnvironment(long seed) {
         super(seed);
 
@@ -74,7 +84,28 @@ public class TWEnvironment extends SimState implements Steppable {
                 holes, this.random, new TWHole(), this);
         this.obstacleCreator = new TWObjectCreator<TWObstacle>(Parameters.obstacleMean,
                 Parameters.obstacleDev, obstacles, this.random, new TWObstacle(), this);
+        this.agents = new ArrayList<TWAgent>();
+        parameters = new ArrayList<HashMap<String,Double>>();
+        parameters.add(UtilityParams.defaultParams());
+        parameters.add(UtilityParams.defaultParams());
+        tiles = new Bag();
+        holes = new Bag();
+        obstacles = new Bag();
+    }
 
+    public TWEnvironment(long seed, ArrayList<HashMap<String,Double>> parameters) {
+        super(seed);
+
+        // create object creation distributions (assumed normal for now)
+
+        this.tileCreator = new TWObjectCreator<TWTile>(Parameters.tileMean, Parameters.tileDev,
+                tiles, this.random, new TWTile(), this);
+        this.holeCreator = new TWObjectCreator<TWHole>(Parameters.holeMean, Parameters.holeDev,
+                holes, this.random, new TWHole(), this);
+        this.obstacleCreator = new TWObjectCreator<TWObstacle>(Parameters.obstacleMean,
+                Parameters.obstacleDev, obstacles, this.random, new TWObstacle(), this);
+        this.parameters = parameters;
+        this.agents = new ArrayList<TWAgent>();
         tiles = new Bag();
         holes = new Bag();
         obstacles = new Bag();
@@ -93,11 +124,14 @@ public class TWEnvironment extends SimState implements Steppable {
         //The environment is also stepped each step
 
         schedule.scheduleRepeating(this, 1, 1.0);
-        
-        //Now we create some agents
-        createAgent(new UtilityAgent2("First", 0, 0, this, Parameters.defaultFuelLevel, UtilityParams.defaultParams()),2);
-        createAgent(new UtilityAgent2("Second", 0, 0, this, Parameters.defaultFuelLevel, UtilityParams.defaultParams2()),3);
 
+        
+        agents.add(new UtilityAgent2("First", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(0)));
+        agents.add(new UtilityAgent2("Second", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(1)));
+        
+        int i = 2;
+        for(TWAgent agent: agents)
+        	createAgent(agent, i++);
 
 
         
@@ -326,6 +360,12 @@ public class TWEnvironment extends SimState implements Steppable {
         }
     }
 
-
+    public int getScore()
+    {
+    	int score = 0;
+    	for(TWAgent agent: agents)
+    		score += agent.getScore();
+    	return score;
+    }
    
 }

@@ -21,7 +21,7 @@ public class Parameters {
     public static final long endTime = 5000; //no effect with gui
 
     //Agent Parameters
-    public static final int defaultFuelLevel = 50000;
+    public static final int defaultFuelLevel = 200;
     public static final int defaultSensorRange = 3;
 
     //Environment Parameters
@@ -29,12 +29,12 @@ public class Parameters {
     public static final int yDimension = 50;
 
     //Object Parameters
-    public static final double tileMean = 0.2;
-    public static final double holeMean = 0.2;
-    public static final double obstacleMean = 0.2;
+    public static final double tileMean = 0.3;
+    public static final double holeMean = 0.3;
+    public static final double obstacleMean = 0.5;
     public static final double tileDev = 0.05f;
     public static final double holeDev = 0.05f;
     public static final double obstacleDev = 0.05f;
-    public static final int lifeTime = 100;
+    public static final int lifeTime = 5000;
 
 }

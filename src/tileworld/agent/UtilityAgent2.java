@@ -68,7 +68,7 @@ public class UtilityAgent2 extends TWAgent{
 		this.parameters = parameters;
 		this.name = name;
 		this.locationSnaps = new LinkedList<Int2D>();
-		this.corners = new ArrayList<Int2D>(4);
+		this.corners = new ArrayList<Int2D>(4); //doesn't do anything for now. it's use has been commented out. 
 		corners.add(new Int2D(Parameters.defaultSensorRange, Parameters.defaultSensorRange));
 		corners.add(new Int2D(Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
 		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, Parameters.defaultSensorRange));
@@ -90,7 +90,7 @@ public class UtilityAgent2 extends TWAgent{
 			return new TWThought(null, null);
 		//add reaction wait() if obstacles on all four sides
 		//Start of rational part
-
+		
 		computeUtilities();
 		if(impossible(currentPlan))
 		{
@@ -101,12 +101,12 @@ public class UtilityAgent2 extends TWAgent{
 		else
 		{
 			Intention newIntention = null;
-			if(reconsider(currentPlan))
+			if(reconsider(currentPlan)) //needs to be completed. 
 			{
 				HashMap<IntentionType, Double> utilities = options();
 				newIntention = filter(utilities);	
 			}
-			if(!sound(currentPlan, newIntention))	
+			if(!sound(currentPlan, newIntention))	//needs to be completed. 
 			{
 				currentPlan = plan(newIntention);
 				currIntention = newIntention;
@@ -114,9 +114,12 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(DEBUG)
 		{
+			System.out.println("the plan/list of thoughts has been returned");
 			System.out.print(name + " ");
 			System.out.println(currIntention);
-			System.out.println(currentPlan.peek());
+			if(currentPlan.peek().getAction()!=null)
+			System.out.println("Current plan's next action is" + currentPlan.peek());
+			else System.out.println("Current Plan is to wait");
 		}
 		
 
@@ -128,6 +131,7 @@ public class UtilityAgent2 extends TWAgent{
 				locationSnaps.remove();
 		}
 		
+		System.out.println("about to return currentplan.next");
 		return currentPlan.next();
 	}
 
@@ -192,10 +196,10 @@ public class UtilityAgent2 extends TWAgent{
 		if (currentPlan == null || currentPlan.peek() == null || !currentPlan.hasNext())
 			return true;
 		TWDirection next = currentPlan.peek().getDirection();
-		return getMemory().isCellBlocked(x + next.dx, y + next.dy, -1);
+		return getMemory().isCellBlocked(x + next.dx, y + next.dy, -1); 
 	}
 
-	public double fueling()
+	public double fueling() //calculates fuel utility
 	{
 		double fuelLevel = getFuelLevel();
 		if((Parameters.endTime - getEnvironment().schedule.getTime()) <= fuelLevel)
@@ -374,17 +378,35 @@ public class UtilityAgent2 extends TWAgent{
 			break;
 		case REFUEL:
 			path = fuelPathGen.generateRefuelPath();
+			if(path == null) //test code
+				System.out.print("No path available");
+			else {
+			for (int z = 0; z<path.size(); z++)
+			{
+				System.out.print(path.getStep(z).getDirection());
+			}
 			break;
+			} //end of test code
 		}
 		if(path == null || !path.hasNext())
 		{
-			thoughts.add(new TWThought(TWAction.MOVE, findReactiveDirection(intention.getLocation().getX(), intention.getLocation().getY())));
+			System.out.println("inside if path==null thing");
+			switch(intention.getIntentionType())
+			{
+			case REFUEL:
+				System.out.println("Inside switch");
+				thoughts.add(new TWThought(null, null));
+				System.out.println("added null thought");
+				break;
+			default: thoughts.add(new TWThought(TWAction.MOVE, findReactiveDirection(intention.getLocation().getX(), intention.getLocation().getY())));
+			}
 		}
 		else
 		{
 			for(TWPathStep pathStep: path.getpath())
 				thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
 		}
+		System.out.println("about to return list of thoughts. ");
 		return new TWPlan(thoughts);
 	}
 
@@ -442,7 +464,7 @@ public class UtilityAgent2 extends TWAgent{
 		return null;
 	}
 
-	private Int2D getFarthestCorner(Int2D[] from) {
+	private Int2D getFarthestCorner(Int2D[] from) { //function does nothing. Function call has been commented out somewhere above. 
 		Int2D farthest = null;
 		int maxD = 0;
 		for(Int2D corner: corners)

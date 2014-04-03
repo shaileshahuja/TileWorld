@@ -43,7 +43,8 @@ public class TWThought {
     
     @Override
     public String toString() {
-    	String result = action.name() + " ";
+		String result = action.name() + " ";     	
+
     	if(direction != null)
     		result += direction.name();
     	else

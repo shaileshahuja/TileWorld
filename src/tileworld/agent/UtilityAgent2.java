@@ -50,7 +50,7 @@ import tileworld.planners.TWRefuelPathGenerator;
 
 public class UtilityAgent2 extends TWAgent{
 	private static final long serialVersionUID = 1L;
-	private HashMap<String, Double> parameters;
+	private HashMap<String, Double> parameters; // not to be confused with a parameter object
 	private PriorityQueue<TWHole> holes;
 	private PriorityQueue<TWTile> tiles;
 	private TWPlan currentPlan = null;
@@ -84,7 +84,7 @@ public class UtilityAgent2 extends TWAgent{
 			return new TWThought(TWAction.PICKUP, null);
 		if(hasTile() && current instanceof TWHole)
 			return new TWThought(TWAction.PUTDOWN, null);
-		if(x == getEnvironment().getFuelingStation().getX() && y == getEnvironment().getFuelingStation().getY() && getFuelLevel() / Parameters.defaultFuelLevel < 0.5)
+		if(x == getEnvironment().getFuelingStation().getX() && y == getEnvironment().getFuelingStation().getY() && getFuelLevel() != Parameters.defaultFuelLevel)
 			return new TWThought(TWAction.REFUEL, null);
 		if(surrounded())
 			return new TWThought(null, null);
@@ -101,12 +101,12 @@ public class UtilityAgent2 extends TWAgent{
 		else
 		{
 			Intention newIntention = null;
-			if(reconsider(currentPlan)) //needs to be completed. 
+			if(reconsider(currentPlan, currIntention))  
 			{
 				HashMap<IntentionType, Double> utilities = options();
 				newIntention = filter(utilities);	
 			}
-			if(!sound(currentPlan, newIntention))	//needs to be completed. 
+			if(!sound(currentPlan, newIntention))	 
 			{
 				currentPlan = plan(newIntention);
 				currIntention = newIntention;
@@ -114,7 +114,6 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(DEBUG)
 		{
-			System.out.println("the plan/list of thoughts has been returned");
 			System.out.print(name + " ");
 			System.out.println(currIntention);
 			if(currentPlan.peek().getAction()!=null)
@@ -132,7 +131,6 @@ public class UtilityAgent2 extends TWAgent{
 				locationSnaps.remove();
 		}
 		
-		System.out.println("about to return currentplan.next");
 		return currentPlan.next();
 	}
 
@@ -141,7 +139,7 @@ public class UtilityAgent2 extends TWAgent{
 				&& getMemory().isCellBlocked(x + 1, y, -1) && getMemory().isCellBlocked(x - 1, y, -1);
 	}
 
-	private boolean reconsider(TWPlan currentPlan)
+	private boolean reconsider(TWPlan currentPlan, Intention intention)
 	{
 		return true;
 	}
@@ -205,7 +203,8 @@ public class UtilityAgent2 extends TWAgent{
 		double fuelLevel = getFuelLevel();
 		if((Parameters.endTime - getEnvironment().schedule.getTime()) <= fuelLevel)
 			return 0;
-		double bufferFuel = (getEnvironment().getxDimension() + getEnvironment().getyDimension()) * parameters.get(UtilityParams.BUFFER_RATIO);
+		//double bufferFuel = (getEnvironment().getxDimension() + getEnvironment().getyDimension()) * parameters.get(UtilityParams.BUFFER_RATIO);
+		double bufferFuel = (this.getX()+ this.getY()) * parameters.get(UtilityParams.BUFFER_RATIO);
 		double distance = getDistanceTo(getEnvironment().getFuelingStation());
 		distance += bufferFuel; 
 
@@ -337,8 +336,24 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if (explore)
 		{
-			Int2D location = getExploreLocation();
-			return new Intention(IntentionType.EXPLORE, location);
+			if(this.currIntention != null)
+			{
+			switch(this.currIntention.getIntentionType()){
+			case REFUEL: if(this.fuelLevel == Parameters.defaultFuelLevel) //if it's at the fuel station, then pointless keeping refuel as it's intention 
+						{
+							Int2D location = getExploreLocation();
+							return new Intention(IntentionType.EXPLORE, location);
+						}
+						return this.currIntention;
+			default: Int2D location = getExploreLocation();
+					 return new Intention(IntentionType.EXPLORE, location);
+			}
+			}
+			else{
+				Int2D location = getExploreLocation();
+				return new Intention(IntentionType.EXPLORE, location);
+			}				
+					 		
 		}
 
 		if(utilities.get(IntentionType.REFUEL) >= utilities.get(IntentionType.PICKUPTILE) && 
@@ -391,13 +406,10 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(path == null || !path.hasNext())
 		{
-			System.out.println("inside if path==null thing");
 			switch(intention.getIntentionType())
 			{
 			case REFUEL:
-				System.out.println("Inside switch");
 				thoughts.add(new TWThought(null, null));
-				System.out.println("added null thought");
 				break;
 			default: thoughts.add(new TWThought(TWAction.MOVE, findReactiveDirection(intention.getLocation().getX(), intention.getLocation().getY())));
 			}
@@ -407,12 +419,12 @@ public class UtilityAgent2 extends TWAgent{
 			for(TWPathStep pathStep: path.getpath())
 				thoughts.add(new TWThought(TWAction.MOVE, pathStep.getDirection()));
 		}
-		System.out.println("about to return list of thoughts. ");
 		return new TWPlan(thoughts);
 	}
 
 
 	private Int2D getExploreLocation() {
+		
 		if(locationSnaps.size() <= 1)
 			return getRandomLocation();
 		

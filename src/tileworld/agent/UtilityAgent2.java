@@ -120,6 +120,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(currentPlan.peek().getAction()!=null)
 			System.out.println("Current plan's next action is" + currentPlan.peek());
 			else System.out.println("Current Plan is to wait");
+			System.out.println(this.getScore());
 		}
 		
 
@@ -432,12 +433,29 @@ public class UtilityAgent2 extends TWAgent{
 				return location2;
 		}
 			
-		//if we are already at the end			
-		return getRandomLocation();
-//		Int2D[] from = new Int2D[locationSnaps.size() + 1];
-//		from = locationSnaps.toArray(from);
-//		from[locationSnaps.size()] = new Int2D(x, y);
-//		return getFarthestCorner(from);
+		//if we are already at the end		
+		Int2D[] from = new Int2D[locationSnaps.size() + 1];
+		from = locationSnaps.toArray(from);
+		from[locationSnaps.size()] = new Int2D(x, y);
+		return getFarthestRandomLocation(from);
+	}
+
+	private Int2D getFarthestRandomLocation(Int2D[] from) {
+		Int2D farthest = null;
+		int maxD = 0;
+		for(int i = 0; i < 5; i++)
+		{
+			Int2D location = getRandomLocation();
+			int distance = 0;
+			for(Int2D point: from)
+				distance += getEnvironment().getDistance(location.x, location.y, point.x, point.y);
+			if(distance > maxD)
+			{
+				farthest = location;
+				maxD = distance;
+			}
+		}
+		return farthest;
 	}
 
 	private Int2D getLocationByDirection(Int2D cur, Int2D prev) {

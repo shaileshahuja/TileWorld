@@ -120,6 +120,7 @@ public class UtilityAgent2 extends TWAgent{
 			System.out.println("Current plan's next action is" + currentPlan.peek());
 			else System.out.println("Current Plan is to wait");
 			System.out.println(this.getScore());
+			System.out.println(this.getFuelLevel());
 		}
 		
 
@@ -204,9 +205,12 @@ public class UtilityAgent2 extends TWAgent{
 		if((Parameters.endTime - getEnvironment().schedule.getTime()) <= fuelLevel)
 			return 0;
 		//double bufferFuel = (getEnvironment().getxDimension() + getEnvironment().getyDimension()) * parameters.get(UtilityParams.BUFFER_RATIO);
-		double bufferFuel = (this.getX()+ this.getY()) * parameters.get(UtilityParams.BUFFER_RATIO);
-		double distance = getDistanceTo(getEnvironment().getFuelingStation());
-		distance += bufferFuel; 
+		double bufferratio;
+		bufferratio = ((this.getX() + this.getY())/(getEnvironment().getxDimension() + getEnvironment().getyDimension()))*parameters.get(UtilityParams.BUFFER_RATIO); //buffer ratio is calculated such that it's max value = parameters.buffer ratio when the agent is at the edge and it's a fraction of that value when the agent is closer to the refueling station. It considers relative position of the agent in the environment. 
+		double bufferFuel = (this.getX()+ this.getY()) * bufferratio; //buffer fuel is calculated such that it's higher when farther away, lower when closer. this exponentially reduces because both it's terms reduce when you're closer. (bufferratio reduces AND distance of agent reduces) //parameters.get(UtilityParams.BUFFER_RATIO);
+		double distance = getDistanceTo(getEnvironment().getFuelingStation()); //nothing has been changed after this. 
+		distance += bufferFuel; //hence, the distance increases/decreases exponentially because it depends on buffer fuel which is exponential. 
+		System.out.println("Distance " + distance + "  Fuel " + fuelLevel); //test code. 
 
 		//reactive
 		if (fuelLevel < distance)
@@ -329,11 +333,24 @@ public class UtilityAgent2 extends TWAgent{
 
 	private Intention filter(HashMap<IntentionType, Double> utilities) {
 		boolean explore = true;
-		for(Double value: utilities.values())
+		/*for(Double value: utilities.values())
 		{
 			if(value > parameters.get(UtilityParams.THRESHOLD_EXPLORE))
 				explore = false;
+		}*/
+		double thresh = parameters.get(UtilityParams.THRESHOLD_EXPLORE); //two threshholds, one low to compare with pick up tile and put in hole, other high to refuel. the reason for this is that right now explore threshhold is too low and agent ends up refueling again and again. but simply making it higher might cause agent to explore when it needs to pick up tiles/drop in hole 
+		double thresh2; //raised threshold in case of refueling. 
+		thresh2 = (getEnvironment().getxDimension() + getEnvironment().getyDimension())*0.3; //thresh2 is a factor of the environment. we can also similarly make thresh1 (just called thresh) a factor of the environment size too, except with a lower multiplier. because we don't wanna risk exploring when we rather pick up tiles and put in hole.  
+		
+		if(utilities.get(IntentionType.PICKUPTILE) > thresh || utilities.get(IntentionType.FILLHOLE) > thresh)
+			explore = false;
+		
+		if(utilities.get(IntentionType.PICKUPTILE) < utilities.get(IntentionType.REFUEL) && utilities.get(IntentionType.FILLHOLE)<utilities.get(IntentionType.REFUEL)) //if refuel has the highest utility compared to pickuptile and putin hole, it checks if we're wasting time refueling or if we rather just explore. 
+		{
+		if(utilities.get(IntentionType.REFUEL)>thresh2) //if we're not wasting time refueling and utility to refuel is infact higher. 
+			explore = false; //NOTE: IF you want to make it explore some more and reduce frequency of refueling during exploration more, just change the thresh2 multiplier from 0.2 to something higher. basically, the point of thresh 2 is so that if the refuel has highest utility, we first check if it's actually necessary to refuel or we rather explore (by raising the explore threshold in this scenario) 
 		}
+		
 		if (explore)
 		{
 			if(this.currIntention != null && currIntention.getIntentionType().equals(IntentionType.REFUEL) && 

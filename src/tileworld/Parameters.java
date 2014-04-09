@@ -21,12 +21,12 @@ public class Parameters {
     public static final long endTime = 5000; //no effect with gui
 
     //Agent Parameters
-    public static final int defaultFuelLevel = 400;
+    public static final int defaultFuelLevel = 200;
     public static final int defaultSensorRange = 3;
 
     //Environment Parameters
-    public static final int xDimension = 100; //size in cells
-    public static final int yDimension = 100;
+    public static final int xDimension = 50; //size in cells
+    public static final int yDimension = 50;
 
     //Object Parameters
     public static final double tileMean = 0.2;

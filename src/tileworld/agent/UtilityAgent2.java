@@ -336,19 +336,9 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if (explore)
 		{
-			if(this.currIntention != null)
-			{
-			switch(this.currIntention.getIntentionType()){
-			case REFUEL: if(this.fuelLevel == Parameters.defaultFuelLevel) //if it's at the fuel station, then pointless keeping refuel as it's intention 
-						{
-							Int2D location = getExploreLocation();
-							return new Intention(IntentionType.EXPLORE, location);
-						}
-						return this.currIntention;
-			default: Int2D location = getExploreLocation();
-					 return new Intention(IntentionType.EXPLORE, location);
-			}
-			}
+			if(this.currIntention != null && currIntention.getIntentionType().equals(IntentionType.REFUEL) && 
+					this.fuelLevel != Parameters.defaultFuelLevel)
+				return currIntention;
 			else{
 				Int2D location = getExploreLocation();
 				return new Intention(IntentionType.EXPLORE, location);

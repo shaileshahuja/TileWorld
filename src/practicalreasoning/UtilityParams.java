@@ -75,7 +75,7 @@ public class UtilityParams {
 	public static HashMap<String, Double> defaultParams()
 	{
 		HashMap<String, Double> params = new HashMap<String, Double>();
-		params.put(BUFFER_RATIO, 0.1);
+		params.put(BUFFER_RATIO, 0.2);
 		params.put(DEVIATION_TILES, 0.3);
 		params.put(DEVIATION_HOLES, 0.3);
 		params.put(DEVIATION_MEM_DECAY, 15.0);
@@ -98,7 +98,7 @@ public class UtilityParams {
 	public static HashMap<String, Double> defaultParams2()
 	{
 		HashMap<String, Double> params = new HashMap<String, Double>();
-		params.put(BUFFER_RATIO, 0.1);
+		params.put(BUFFER_RATIO, 0.2);
 		params.put(DEVIATION_TILES, 0.3);
 		params.put(DEVIATION_HOLES, 0.3);
 		params.put(DEVIATION_MEM_DECAY, 15.0);

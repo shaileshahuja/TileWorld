@@ -2,6 +2,7 @@ package tileworld.agent;
 
 import java.awt.Color;
 import java.util.ArrayList;
+
 import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.engine.Steppable;

@@ -25,8 +25,8 @@ public class Parameters {
     public static final int defaultSensorRange = 3;
 
     //Environment Parameters
-    public static final int xDimension = 50; //size in cells
-    public static final int yDimension = 50;
+    public static final int xDimension = 100; //size in cells
+    public static final int yDimension = 100;
 
     //Object Parameters
     public static final double tileMean = 0.2;

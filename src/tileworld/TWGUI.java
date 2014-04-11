@@ -64,7 +64,7 @@ public class TWGUI extends GUIState {
      * Default constructor, creates a TWEnvironment
      */
     private TWGUI() {
-        this(new TWEnvironment());
+        this(new TWEnvironment(58742934824L));
     }
 
     public static String getName() {

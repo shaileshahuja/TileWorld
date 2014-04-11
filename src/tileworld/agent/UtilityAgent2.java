@@ -69,11 +69,11 @@ public class UtilityAgent2 extends TWAgent{
 		corners.add(new Int2D(Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
 		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, Parameters.defaultSensorRange));
 		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
-		
+
 	}
 
 	protected TWThought think() {
-		
+
 		//High prio reactive
 		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
@@ -86,7 +86,7 @@ public class UtilityAgent2 extends TWAgent{
 			return new TWThought(null, null);
 		//add reaction wait() if obstacles on all four sides
 		//Start of rational part
-		
+
 		computeUtilities();
 		if(impossible(currentPlan))
 		{
@@ -113,12 +113,12 @@ public class UtilityAgent2 extends TWAgent{
 			System.out.print(name + " ");
 			System.out.println(currIntention);
 			if(currentPlan.peek().getAction()!=null)
-			System.out.println("Current plan's next action is" + currentPlan.peek());
+				System.out.println("Current plan's next action is" + currentPlan.peek());
 			else System.out.println("Current Plan is to wait");
 			System.out.println(this.getScore());
 			System.out.println(this.getFuelLevel());
 		}
-		
+
 
 		//store past locations
 		if(getEnvironment().schedule.getSteps() % parameters.get(UtilityParams.GAP_LOCATION_SNAP).intValue() == 0)
@@ -127,7 +127,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(locationSnaps.size() > 5)
 				locationSnaps.remove();
 		}
-		
+
 		return currentPlan.next();
 	}
 
@@ -203,9 +203,9 @@ public class UtilityAgent2 extends TWAgent{
 			return 0;
 		double bufferFuelDeviation = (this.getX()+ this.getY())*parameters.get(UtilityParams.BUFFER_RATIO); 
 		double distance = getDistanceTo(getEnvironment().getFuelingStation()); //nothing has been changed after this. 
-//		//reactive
+		//		//reactive
 		return normalDistribution(100, 0, bufferFuelDeviation, fuelLevel - distance);
-//		System.out.println("Distance " + distance + " Buffer fuel " + bufferFuel + "  Fuel " + fuelLevel + " utility " + val); //test code. 
+		//		System.out.println("Distance " + distance + " Buffer fuel " + bufferFuel + "  Fuel " + fuelLevel + " utility " + val); //test code. 
 	}
 
 	public void computeUtilities()
@@ -337,7 +337,7 @@ public class UtilityAgent2 extends TWAgent{
 				Int2D location = getExploreLocation();
 				return new Intention(IntentionType.EXPLORE, location);
 			}				
-					 		
+
 		}
 
 		if(utilities.get(IntentionType.REFUEL) >= utilities.get(IntentionType.PICKUPTILE) && 
@@ -378,14 +378,17 @@ public class UtilityAgent2 extends TWAgent{
 			break;
 		case REFUEL:
 			path = fuelPathGen.generateRefuelPath();
-			if(path == null) //test code
-				System.out.print("No path available");
-			else {
-			for (int z = 0; z<path.size(); z++)
+			if(DEBUG)
 			{
-				System.out.print(path.getStep(z).getDirection());
-			}
-			break;
+				if(path == null) //test code
+					System.out.print("No path available");
+				else {
+					for (int z = 0; z<path.size(); z++)
+					{
+						System.out.print(path.getStep(z).getDirection());
+					}
+				}
+				break;
 			} //end of test code
 		}
 		if(path == null || !path.hasNext())
@@ -408,10 +411,10 @@ public class UtilityAgent2 extends TWAgent{
 
 
 	private Int2D getExploreLocation() {
-		
+
 		if(locationSnaps.size() <= 1)
 			return getRandomLocation();
-		
+
 		//return end location in a straight line
 		Int2D cur = new Int2D(x, y);
 		Int2D prev = locationSnaps.getLast();
@@ -428,7 +431,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(location2 != null)
 				return location2;
 		}
-			
+
 		//if we are already at the end		
 		Int2D[] from = new Int2D[locationSnaps.size() + 1];
 		from = locationSnaps.toArray(from);
@@ -466,7 +469,7 @@ public class UtilityAgent2 extends TWAgent{
 			endY = getEnvironment().getyDimension() - Parameters.defaultSensorRange;
 		else
 			endY = Parameters.defaultSensorRange;
-		
+
 		double timeX = (endX - cur.x) / speedX;
 		double timeY = (endY - cur.y) / speedY;
 		if(timeX != 0 && timeY != 0 && endX - cur.x > 2 && endY - cur.y > 2)
@@ -493,7 +496,7 @@ public class UtilityAgent2 extends TWAgent{
 			}
 		}
 		return farthest;
-	}
+	}	
 
 	private Int2D getRandomLocation()
 	{

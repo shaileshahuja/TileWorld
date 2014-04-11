@@ -5,12 +5,12 @@ import java.util.HashMap;
 public class UtilityParams {
 	
 	/**
-	 * Range 0 to 1. Expected not more than 0.3.
+	 * Range 0 to 1. Expected not more than 0.4. MEDIUM
 	 */
 	public static final String BUFFER_RATIO = "bufferRatio";
 	
 	/**
-	 * Range 0 to 1. 
+	 * Range 0 to 1. All DEVIATION ARE IMPORTANT
 	 */
 	public static final String DEVIATION_TILES = "deviationTiles";
 	
@@ -20,7 +20,7 @@ public class UtilityParams {
 	public static final String DEVIATION_HOLES = "deviationHoles";
 	
 	/**
-	 * Range 0 to lifetime of the environment (5000 steps). Expected less than 100.
+	 * Integer range 0 to lifetime of the environment (5000 steps). Expected less than 100.
 	 */
 	public static final String DEVIATION_MEM_DECAY = "deviationMemoryDecay";
 	
@@ -36,7 +36,7 @@ public class UtilityParams {
 	public static final String WEIGHT_COMBINATION = "combinationWeight";
 	
 	/**
-	 * Range 0 to 1 for all pickup and putdown utilities
+	 * Range 0 to 1 for all pickup and putdown utilities. ALL SIX IMPORTANT
 	 */
 	public static final String PICKUP_ZERO_TILES = "pickup0";
 	public static final String PICKUP_ONE_TILES = "pickup1";
@@ -59,11 +59,12 @@ public class UtilityParams {
 	 * Used for faking memory decay in isCellBlocked() method.
 	 * Range depends on the range of the lifetime of an object (Paramters.lifeTime). Expected integer range: 1 - 5000
 	 * NOTE: We are not allowed to use Paramters.lifeTime. We need to make a good guess here.
+	 * Use communication to guess this value
 	 */
 	public static final String DECAY_MEMORY_AFTER = "memoryDecay";
 	
 	/**
-	 * Double range 0 to 100. 
+	 * Double range 0 to 100. IMPORTANT
 	 */
 	public static final String THRESHOLD_EXPLORE = "exploreThreshold";
 

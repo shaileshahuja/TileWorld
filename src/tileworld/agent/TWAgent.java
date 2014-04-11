@@ -155,7 +155,8 @@ public abstract class TWAgent extends TWEntity implements Steppable {
     protected final void refuel() {
         assert (this.sameLocation(this.getEnvironment().getFuelingStation()));
         this.fuelLevel = Parameters.defaultFuelLevel;
-        System.out.print("REFUELED");
+        if(DEBUG)
+        	System.out.print("REFUELED");
     }
 
     /**

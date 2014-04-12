@@ -56,8 +56,13 @@ public class UtilityAgent2 extends TWAgent{
 	private TWRefuelPathGenerator fuelPathGen;
 	private LinkedList<Int2D> locationSnaps;
 	private ArrayList<Int2D> corners;
+	
+	// Communication variables
 	private Message msgReceived;
 	private Message msgToSend;
+	private String curRequest;
+	private Int2D locOther;
+	
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
 	public UtilityAgent2(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
@@ -186,9 +191,24 @@ public class UtilityAgent2 extends TWAgent{
 	private void receiveMsg(){
 		this.msgReceived = PostBox.get(this.name);
 		// put message into internal memory
+		if(msgReceived.getX() >-1 && msgReceived.getY()>-1){
+			locOther = new Int2D(msgReceived.getX(), msgReceived.getY());
+		}
+		if(msgReceived.getRequest()!="" && msgReceived.getRequest()!=null){
+			curRequest = msgReceived.getRequest();
+		}
+		else{ curRequest = null;}
+		if(msgReceived.getObs1()!=null && ((msgReceived.getObs1().getO() instanceof TWObstacle) || (msgReceived.getObs1().getO() instanceof TWHole) || (msgReceived.getObs1().getO() instanceof TWTile))){
+			this.getMemory().updateMemory(msgReceived.getObs1());
+		}
+		if(msgReceived.getResponse()!=null && ((msgReceived.getResponse().getO() instanceof TWObstacle) || (msgReceived.getResponse().getO() instanceof TWHole) || (msgReceived.getResponse().getO() instanceof TWTile))){
+			this.getMemory().updateMemory(msgReceived.getResponse());
+		}
 	}
 	private void sendMsg(){
 		// create message to send using a variety of things
+		int sendLocX = this.getX();
+		int sendLocY = this.getY();
 		this.msgToSend = new Message(); // put values in constructor
 		PostBox.put(this.name, msgToSend);
 	}

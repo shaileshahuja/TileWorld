@@ -30,6 +30,7 @@ import tileworld.planners.AstarPathGenerator;
 import tileworld.planners.TWPath;
 import tileworld.planners.TWPathStep;
 import tileworld.planners.TWRefuelPathGenerator;
+import communication.*;
 
 /**
  * TWContextBuilder
@@ -55,6 +56,8 @@ public class UtilityAgent2 extends TWAgent{
 	private TWRefuelPathGenerator fuelPathGen;
 	private LinkedList<Int2D> locationSnaps;
 	private ArrayList<Int2D> corners;
+	private Message msgReceived;
+	private Message msgToSend;
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
 	public UtilityAgent2(String name, int xpos, int ypos, TWEnvironment env, double fuelLevel, HashMap<String, Double> parameters) {
@@ -73,7 +76,7 @@ public class UtilityAgent2 extends TWAgent{
 	}
 
 	protected TWThought think() {
-		
+		receiveMsg();
 		//High prio reactive
 		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
@@ -174,9 +177,20 @@ public class UtilityAgent2 extends TWAgent{
 			default:
 				break;			
 			}
+			// Agents sends its message
+			sendMsg();
 		}  catch (CellBlockedException ex) {
 			ex.printStackTrace();
 		}
+	}
+	private void receiveMsg(){
+		this.msgReceived = PostBox.get(this.name);
+		// put message into internal memory
+	}
+	private void sendMsg(){
+		// create message to send using a variety of things
+		this.msgToSend = new Message(); // put values in constructor
+		PostBox.put(this.name, msgToSend);
 	}
 
 

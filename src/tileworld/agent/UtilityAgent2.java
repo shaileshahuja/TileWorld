@@ -199,16 +199,40 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		else{ curRequest = null;}
 		if(msgReceived.getObs1()!=null && ((msgReceived.getObs1().getO() instanceof TWObstacle) || (msgReceived.getObs1().getO() instanceof TWHole) || (msgReceived.getObs1().getO() instanceof TWTile))){
-			this.getMemory().updateMemory(msgReceived.getObs1());
+			int rx = msgReceived.getObs1().getO().getX();
+			int ry = msgReceived.getObs1().getO().getY();
+			if( msgReceived.getObs1().getT() > this.memory.getPerceptAt(rx, ry).getT()){
+				this.getMemory().updateMemory(msgReceived.getObs1());
+			}
 		}
 		if(msgReceived.getResponse()!=null && ((msgReceived.getResponse().getO() instanceof TWObstacle) || (msgReceived.getResponse().getO() instanceof TWHole) || (msgReceived.getResponse().getO() instanceof TWTile))){
-			this.getMemory().updateMemory(msgReceived.getResponse());
+			int rx = msgReceived.getResponse().getO().getX();
+			int ry = msgReceived.getResponse().getO().getY();
+			if( msgReceived.getResponse().getT() > this.memory.getPerceptAt(rx, ry).getT()){
+				this.getMemory().updateMemory(msgReceived.getResponse());
+			}
 		}
 	}
 	private void sendMsg(){
 		// create message to send using a variety of things
 		int sendLocX = this.getX();
 		int sendLocY = this.getY();
+		String myReq="";
+		if(this.currIntention.getIntentionType().equals("EXPLORE")){
+			if(this.carriedTiles.size()==3) myReq = "HOLE";
+			else if(carriedTiles.size()==0) myReq = "TILE";
+			else myReq = "ANYTHING";
+		}
+		if(curRequest!=null && curRequest!=""){
+			TWEntity resp;
+			switch(curRequest.charAt(0)){
+			case 'T': resp = this.getMemory().getNearbyTile(sendLocX, sendLocY, parameters.get(UtilityParams.DEVIATION_MEM_DECAY));
+				break;
+			case 'H': resp = this.getMemory().getNearbyHole(sendLocX, sendLocY, parameters.get(UtilityParams.DEVIATION_MEM_DECAY));
+			default: 
+				break;
+			}
+		}
 		this.msgToSend = new Message(); // put values in constructor
 		PostBox.put(this.name, msgToSend);
 	}

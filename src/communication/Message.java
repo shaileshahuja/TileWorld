@@ -30,4 +30,9 @@ public class Message {
 		response = null;
 		obstacle1 = null; 
 	}
+	public int getX(){return x;}
+	public int getY(){return y;}
+	public String getRequest(){return request;}
+	public TWAgentPercept getObs1(){return obstacle1;}
+	public TWAgentPercept getResponse(){return response;}
 }

@@ -99,6 +99,10 @@ public class TWAgentWorkingMemory {
      * @param agentXCoords bag containing x coordinates of agents
      * @param agentYCoords bag containing y coordinates of agents
     */
+    // Communication function
+    public void updateMemory(TWAgentPercept percept){
+    	objects[percept.getO().getX()][percept.getO().getY()] = percept;
+    }
     public void updateMemory(Bag sensedObjects, IntBag objectXCoords, IntBag objectYCoords, Bag sensedAgents, IntBag agentXCoords, IntBag agentYCoords) {
         //reset the closest objects for new iteration of the loop (this is short
         //term observation memory if you like) It only lasts one timestep

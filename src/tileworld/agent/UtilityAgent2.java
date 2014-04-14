@@ -711,7 +711,7 @@ public class UtilityAgent2 extends TWAgent{
 			
 			else if(this.carriedTiles.size()==3)
 			{
-				if(this.tiles.size() <= 1)
+				if(this.holes.size() <=2)
 				{
 					myReq = "ANYTHING";			
 					if(this.getMemory().getSimulationTime()%5 == 0)
@@ -766,7 +766,7 @@ public class UtilityAgent2 extends TWAgent{
 			}
 			else if(this.carriedTiles.size()==2)
 			{
-				if(this.tiles.size() <= 2)
+				if(this.holes.size() <= 1)
 				{
 					myReq = "ANYTHING";	
 					if(this.getMemory().getSimulationTime()%5 == 0)
@@ -821,7 +821,7 @@ public class UtilityAgent2 extends TWAgent{
 			}
 			else if(this.carriedTiles.size()==1)
 			{
-				if(this.tiles.size() <= 3)
+				if(this.tiles.size() < 1)
 				{
 					myReq = "TILE";
 					if(this.getMemory().getSimulationTime()%5 == 0)

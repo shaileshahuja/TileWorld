@@ -123,8 +123,10 @@ public abstract class TWAgent extends TWEntity implements Steppable {
         carriedTiles.add(tile);
         //below is not strictly necessary as the location will be overwritten with agent
         //but for clarity include this here.
+        if(tile != null)
         this.getEnvironment().getObjectGrid().set(tile.getX(), tile.getY(), null);
         if(DEBUG)
+        	if(tile != null)
         	System.out.println("Tile picked at " + x + " " + y);
     }
 

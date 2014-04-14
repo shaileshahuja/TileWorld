@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 import practicalreasoning.Intention;
 import practicalreasoning.IntentionType;
@@ -31,6 +32,7 @@ import tileworld.planners.TWPath;
 import tileworld.planners.TWPathStep;
 import tileworld.planners.TWRefuelPathGenerator;
 import communication.*;
+
 
 /**
  * TWContextBuilder
@@ -56,12 +58,20 @@ public class UtilityAgent2 extends TWAgent{
 	private TWRefuelPathGenerator fuelPathGen;
 	private LinkedList<Int2D> locationSnaps;
 	private ArrayList<Int2D> corners;
-	
+	private int xboundary1;
+	private int yboundary1;
+	private int xboundary2;
+	private int yboundary2;
+	private int upperboundx;
+	private int upperboundy;
+	private int lowerboundx;
+	private int lowerboundy;
 	// Communication variables
 	private Message msgReceived;
 	private Message msgToSend;
 	private String curRequest;
-	private Int2D locOther;
+	private int locotherx = 0, locothery = 0;
+	private int loctargetx = 0, loctargety =0;
 	
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
@@ -79,9 +89,14 @@ public class UtilityAgent2 extends TWAgent{
 		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
 		
 	}
+	
+	protected void sense()
+	{
+		receiveMsg();
+		sensor.sense();
+	}
 
 	protected TWThought think() {
-		receiveMsg();
 		//High prio reactive
 		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
@@ -168,13 +183,15 @@ public class UtilityAgent2 extends TWAgent{
 				break;
 			case PICKUP:
 				TWTile tile = (TWTile)getEnvironment().getObjectGrid().get(x, y);
-				this.pickUpTile(tile);
-				this.getMemory().removeObject(tile);
+				if(tile != null)
+				{this.pickUpTile(tile);
+				this.getMemory().removeObject(tile);}
 				break;
 			case PUTDOWN:
 				TWHole hole = (TWHole)getEnvironment().getObjectGrid().get(x, y);
-				this.putTileInHole(hole);
-				this.getMemory().removeObject(hole);
+				if(hole != null)
+				{this.putTileInHole(hole);
+				this.getMemory().removeObject(hole);}
 				break;
 			case REFUEL:
 				refuel();
@@ -191,50 +208,707 @@ public class UtilityAgent2 extends TWAgent{
 	private void receiveMsg(){
 		this.msgReceived = PostBox.get(this.name);
 		// put message into internal memory
+		if(msgReceived != null){
+			System.out.println("We have received a message");
 		if(msgReceived.getX() >-1 && msgReceived.getY()>-1){
-			locOther = new Int2D(msgReceived.getX(), msgReceived.getY());
+			locotherx = msgReceived.getX();
+			locothery = msgReceived.getY();
+			System.out.println("We have received the other's location");
 		}
+		if(msgReceived.getX2() >-1 && msgReceived.getY2() >-1)
+		{
+			loctargetx = msgReceived.getX2();
+			loctargety = msgReceived.getY2();
+			System.out.println("We have received the other's target");
+
+		}
+		
 		if(msgReceived.getRequest()!="" && msgReceived.getRequest()!=null){
 			curRequest = msgReceived.getRequest();
+			System.out.println("We have received the other's request");
 		}
 		else{ curRequest = null;}
 		if(msgReceived.getObs1()!=null && ((msgReceived.getObs1().getO() instanceof TWObstacle) || (msgReceived.getObs1().getO() instanceof TWHole) || (msgReceived.getObs1().getO() instanceof TWTile))){
 			int rx = msgReceived.getObs1().getO().getX();
 			int ry = msgReceived.getObs1().getO().getY();
-			if( msgReceived.getObs1().getT() > this.memory.getPerceptAt(rx, ry).getT()){
+			if(this.memory.getPerceptAt(rx, ry)!=null) 
+			{if(msgReceived.getObs1().getT() > this.memory.getPerceptAt(rx, ry).getT()){
 				this.getMemory().updateMemory(msgReceived.getObs1());
-			}
+			}}
+			else
+				this.getMemory().updateMemory(msgReceived.getObs1());
+			System.out.println("We have received the other's object that's sent");
+
 		}
 		if(msgReceived.getResponse()!=null && ((msgReceived.getResponse().getO() instanceof TWObstacle) || (msgReceived.getResponse().getO() instanceof TWHole) || (msgReceived.getResponse().getO() instanceof TWTile))){
 			int rx = msgReceived.getResponse().getO().getX();
 			int ry = msgReceived.getResponse().getO().getY();
-			if( msgReceived.getResponse().getT() > this.memory.getPerceptAt(rx, ry).getT()){
+			if(this.memory.getPerceptAt(rx, ry) !=null)
+			{if(msgReceived.getResponse().getT() > this.memory.getPerceptAt(rx, ry).getT()){
 				this.getMemory().updateMemory(msgReceived.getResponse());
+			}}
+			else this.getMemory().updateMemory(msgReceived.getResponse());
+			System.out.println("We have received the other's response to request");
+
+		}
+		}
+	}
+	private void CheckBoundary()
+	{
+		xboundary1= locotherx;
+		yboundary1= locothery;
+		xboundary2= loctargetx;
+		yboundary2= loctargety;
+		
+		if(xboundary1==xboundary2 )
+		{
+		xboundary1=xboundary1-20;
+		xboundary2=xboundary2+20;
+		}
+		else if(yboundary1==yboundary2)
+		{
+			yboundary1=yboundary1-20;
+			yboundary2=yboundary2+20;;
+		}
+		else
+		{
+			if(xboundary1>xboundary2)
+			{
+				xboundary1=xboundary1+20;
+				xboundary2=xboundary2-20;
+			}
+			else if(xboundary1<xboundary2)
+			{
+				xboundary1 = xboundary1 - 20;
+				xboundary2 = xboundary2 + 20;
 			}
 		}
+		if(xboundary1>xboundary2)
+			{
+			upperboundx = xboundary1;
+			lowerboundx = xboundary2;
+			}
+		else
+		{
+			upperboundx = xboundary2;
+			lowerboundx = xboundary1;
+		}
+		
+		if(yboundary1>yboundary2)
+		{
+			upperboundy = yboundary1;
+			lowerboundy = yboundary2;
+		}
+		else 
+			{
+			upperboundy = yboundary2;
+			lowerboundy = yboundary1;
+			}
+		
+		if(upperboundy>this.getEnvironment().getyDimension())
+			upperboundy=this.getEnvironment().getyDimension();
+		if(lowerboundy<0)
+			lowerboundy=0;
+		if(upperboundx>this.getEnvironment().getxDimension())
+			upperboundx=this.getEnvironment().getxDimension();
+		if(lowerboundx<0)
+			lowerboundx=0;
+		if(upperboundx-lowerboundx==0)
+			upperboundx=upperboundx+1;
+		if(upperboundy-lowerboundy==0)
+			upperboundy++;
+	
 	}
 	private void sendMsg(){
 		// create message to send using a variety of things
-		int sendLocX = this.getX();
-		int sendLocY = this.getY();
+		System.out.println("Entering Send");
+		TWAgentPercept resp = null;
+		int sendLocX2;
+		int sendLocY2;
 		String myReq="";
-		if(this.currIntention.getIntentionType().equals("EXPLORE")){
-			if(this.carriedTiles.size()==3) myReq = "HOLE";
-			else if(carriedTiles.size()==0) myReq = "TILE";
-			else myReq = "ANYTHING";
-		}
+		Message msg = null;
+		
 		if(curRequest!=null && curRequest!=""){
-			TWEntity resp;
+			TWEntity respx;
+			TWEntity tile;
+			TWEntity hole;
 			switch(curRequest.charAt(0)){
-			case 'T': resp = this.getMemory().getNearbyTile(sendLocX, sendLocY, parameters.get(UtilityParams.DEVIATION_MEM_DECAY));
+			case 'T': respx = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  if(respx != null)	
+					  {	  if(respx.getX() == currIntention.getLocation().getX() && respx.getY() == currIntention.getLocation().getY())
+						   respx = (TWObstacle) this.getMemory().getNearbyObject(this.getX(), this.getY(), 0, TWObstacle.class);
+					  if(respx != null)
+						  resp = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  
+					  }
+					  
 				break;
-			case 'H': resp = this.getMemory().getNearbyHole(sendLocX, sendLocY, parameters.get(UtilityParams.DEVIATION_MEM_DECAY));
+			case 'H': respx = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  if(respx != null){
+					  if(respx.getX() == currIntention.getLocation().getX() && respx.getY() == currIntention.getLocation().getY())
+					  respx = (TWObstacle) this.getMemory().getNearbyObject(this.getX(), this.getY(), 0, TWObstacle.class);
+					  if(respx != null)
+					  resp = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  }
+				break;
+			case 'A': tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  double tiledistance;
+					  if(tile !=null && tile.getX() == currIntention.getLocation().getX() && tile.getY() == currIntention.getLocation().getY())
+					  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+					  else tiledistance = 10000000;
+					  double holedistance;
+					  if(hole != null && hole.getX() == currIntention.getLocation().getX() && hole.getY() == currIntention.getLocation().getY())
+					  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+					  else holedistance = 10000000;
+					  if(tiledistance>=holedistance)
+						  respx = hole;
+					  else respx = tile; 
+					  if (respx != null)
+					  resp = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  break;
 			default: 
 				break;
 			}
 		}
-		this.msgToSend = new Message(); // put values in constructor
-		PostBox.put(this.name, msgToSend);
+		
+		if(curRequest == null || curRequest == "")
+		{
+			System.out.println("Entering currequest==null");
+			CheckBoundary();
+			Random r = new Random(Parameters.seed);
+			TWObstacle obst;
+			double distance;
+			double mintbyd=-1;
+			TWObstacle bestobst = null;
+			double obtimestamp;
+			
+			for(int i=0;i<10;i++)
+			{
+				int randomX=r.nextInt(upperboundx - lowerboundx + 1) + lowerboundx;
+				int randomY=r.nextInt(upperboundy - lowerboundy + 1) + lowerboundy;
+				//System.out.println("upperboundX = " + upperboundx + " upperboundy = " + upperboundy + "lowerboundx = " + lowerboundx + "lowerboundy = " + lowerboundy);
+				//System.out.println("randomX = " + randomX + " randomY = " + randomY);
+				obst = (TWObstacle) this.getMemory().getNearbyObject(randomX, randomY, 0, TWObstacle.class);
+				if(obst!=null)
+				{
+				distance=obst.getDistanceTo(this.loctargetx, this.loctargety);
+				obtimestamp = this.getMemory().getPerceptAt(obst.getX(), obst.getY()).getT();
+				if(obtimestamp/distance>mintbyd)
+				{
+					mintbyd=obtimestamp/distance;
+					bestobst=obst;
+				}	
+				}
+				}
+			if(bestobst != null)
+			{
+				resp = this.getMemory().getPerceptAt(bestobst.getX(), bestobst.getY());
+			}
+			
+				
+		}
+		System.out.println("Intention in sendmsg " + this.currIntention.getIntentionType());
+		if(this.currIntention.getIntentionType().equals(IntentionType.EXPLORE)){
+			System.out.println("Entering explore");
+			TWEntity tile;
+			TWEntity hole;
+			TWEntity respx;
+			TWAgentPercept obj = null;
+			if(this.carriedTiles.size()==3) myReq = "HOLE";
+			else if(carriedTiles.size()==0) myReq = "TILE";
+			else myReq = "ANYTHING";
+			if(this.getMemory().getSimulationTime()%45==0)  /////////////change modulus 30 based on environment size. 
+			{
+				sendLocX2 = this.currIntention.getLocation().getX();
+				sendLocY2 = this.currIntention.getLocation().getY();
+				if(this.getMemory().getSimulationTime()%5==0)
+					msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+				else
+				{
+					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  double tiledistance;
+					  if(tile !=null)
+					  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+					  else tiledistance = 10000000;
+					  double holedistance;
+					  if(hole != null)
+					  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+					  else holedistance = 10000000;
+					  if(tiledistance>=holedistance)
+						  respx = hole;
+					  else respx = tile; 
+					  if(respx != null) 
+					  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+				}
+				
+			}
+			else if(this.getMemory().getSimulationTime()%5 == 0)
+				msg = new Message(this.getX(), this.getY(), myReq, resp);
+				else
+					{
+					  tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  double tiledistance;
+					  if(tile !=null)
+					  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+					  else tiledistance = 10000000;
+					  double holedistance;
+					  if(hole != null)
+					  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+					  else holedistance = 10000000;
+					  if(tiledistance>=holedistance)
+						  respx = hole;
+					  else respx = tile; 
+					  if(respx != null)
+					  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  msg = new Message(obj, myReq, resp);
+					
+					}
+			
+		}
+		if(this.currIntention.getIntentionType().equals(IntentionType.PICKUPTILE))
+		{
+			System.out.println("Entering pickup");
+			TWEntity tile;
+			TWEntity hole;
+			TWEntity respx;
+			TWAgentPercept obj = null;
+			if(this.memory.getSimulationTime() % 45 == 0) /////change modulus to higher numbers for bigger environments. 
+			{
+				sendLocX2 = this.tiles.peek().getX();
+				sendLocY2 = this.tiles.peek().getY();
+				if(this.getMemory().getSimulationTime()%5==0)
+					msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+				else
+				{
+					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  double tiledistance;
+					  if(tile !=null)
+					  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+					  else tiledistance = 10000000;
+					  double holedistance;
+					  if(hole != null)
+					  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+					  else holedistance = 10000000;
+					  if(tiledistance>=holedistance)
+						  respx = hole;
+					  else respx = tile; 
+					  if(respx != null) 
+					  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+				}
+				
+			}
+			else if(this.carriedTiles.size()==2)
+			{
+				if(this.holes.size() <= 2)
+				{
+					myReq = "HOLE";	
+					if(this.getMemory().getSimulationTime()%5 == 0)
+					msg = new Message(this.getX(), this.getY(), myReq, resp);
+					else
+						{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null)
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, myReq, resp);
+						
+						}
+				}
+				else 
+				{
+					sendLocX2 = this.tiles.peek().getX();
+					sendLocY2 = this.tiles.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null) 
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+				}
+			}
+			else if(this.carriedTiles.size()==1)
+			{
+				if(this.holes.size() <= 1)
+				{
+					myReq = "ANYTHING";	
+					if(this.getMemory().getSimulationTime()%5 == 0)
+						msg = new Message(this.getX(), this.getY(), myReq, resp);
+						else
+							{
+							tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+							  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+							  double tiledistance;
+							  if(tile !=null)
+							  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+							  else tiledistance = 10000000;
+							  double holedistance;
+							  if(hole != null)
+							  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+							  else holedistance = 10000000;
+							  if(tiledistance>=holedistance)
+								  respx = hole;
+							  else respx = tile; 
+							  if(respx != null) 
+							  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+							  msg = new Message(obj, myReq, resp);
+							
+							}
+					
+				}
+				else 
+				{
+					sendLocX2 = this.tiles.peek().getX();
+					sendLocY2 = this.tiles.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null) 
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+					
+				}
+			}
+			else if(this.carriedTiles.size()==0)
+			{
+				if(this.holes.size() <= 0)
+				{
+					myReq = "ANYTHING";	
+					if(this.getMemory().getSimulationTime()%5 == 0)
+						msg = new Message(this.getX(), this.getY(), myReq, resp);
+						else
+							{
+							tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+							  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+							  double tiledistance;
+							  if(tile !=null)
+							  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+							  else tiledistance = 10000000;
+							  double holedistance;
+							  if(hole != null)
+							  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+							  else holedistance = 10000000;
+							  if(tiledistance>=holedistance)
+								  respx = hole;
+							  else respx = tile; 
+							  if(respx != null)
+							  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+							  msg = new Message(obj, myReq, resp);
+							
+							}
+				}
+				else 
+				{
+					sendLocX2 = this.tiles.peek().getX();
+					sendLocY2 = this.tiles.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null) 
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+				}
+			}				
+		}
+		if(this.currIntention.getIntentionType().equals(IntentionType.FILLHOLE))
+		{
+			System.out.println("Entering fill");
+
+			TWEntity tile;
+			TWEntity hole;
+			TWEntity respx;
+			TWAgentPercept obj = null;
+			
+			if(this.memory.getSimulationTime() %45 == 0)  ////change modulus to bigger numbers for bigger environments 
+			{
+				sendLocX2 = this.holes.peek().getX();
+				sendLocY2 = this.holes.peek().getY();
+				if(this.getMemory().getSimulationTime()%5==0)
+					msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+				else
+				{
+					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+					  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+					  double tiledistance;
+					  if(tile !=null)
+					  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+					  else tiledistance = 10000000;
+					  double holedistance;
+					  if(hole != null)
+					  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+					  else holedistance = 10000000;
+					  if(tiledistance>=holedistance)
+						  respx = hole;
+					  else respx = tile; 
+					  if(respx != null) 
+					  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+					  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+				}
+				
+			}
+			
+			else if(this.carriedTiles.size()==3)
+			{
+				if(this.tiles.size() <= 1)
+				{
+					myReq = "ANYTHING";			
+					if(this.getMemory().getSimulationTime()%5 == 0)
+						msg = new Message(this.getX(), this.getY(), myReq, resp);
+						else
+							{
+							tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+							  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+							  double tiledistance;
+							  if(tile !=null)
+							  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+							  else tiledistance = 10000000;
+							  double holedistance;
+							  if(hole != null)
+							  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+							  else holedistance = 10000000;
+							  if(tiledistance>=holedistance)
+								  respx = hole;
+							  else respx = tile; 
+							  if(respx != null) 
+							  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+							  msg = new Message(obj, myReq, resp);
+							
+							}
+				}
+				else 
+				{
+					sendLocX2 = this.holes.peek().getX();
+					sendLocY2 = this.holes.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null) 
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+				}
+			}
+			else if(this.carriedTiles.size()==2)
+			{
+				if(this.tiles.size() <= 2)
+				{
+					myReq = "ANYTHING";	
+					if(this.getMemory().getSimulationTime()%5 == 0)
+						msg = new Message(this.getX(), this.getY(), myReq, resp);
+						else
+							{
+							tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+							  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+							  double tiledistance;
+							  if(tile !=null)
+							  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+							  else tiledistance = 10000000;
+							  double holedistance;
+							  if(hole != null)
+							  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+							  else holedistance = 10000000;
+							  if(tiledistance>=holedistance)
+								  respx = hole;
+							  else respx = tile; 
+							  if(respx != null) 
+							  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+							  msg = new Message(obj, myReq, resp);
+							
+							}
+				}
+				else 
+				{
+					sendLocX2 = this.holes.peek().getX();
+					sendLocY2 = this.holes.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null)
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+				}
+			}
+			else if(this.carriedTiles.size()==1)
+			{
+				if(this.tiles.size() <= 3)
+				{
+					myReq = "TILE";
+					if(this.getMemory().getSimulationTime()%5 == 0)
+						msg = new Message(this.getX(), this.getY(), myReq, resp);
+						else
+							{
+							tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+							  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+							  double tiledistance;
+							  if(tile !=null)
+							  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+							  else tiledistance = 10000000;
+							  double holedistance;
+							  if(hole != null)
+							  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+							  else holedistance = 10000000;
+							  if(tiledistance>=holedistance)
+								  respx = hole;
+							  else respx = tile; 
+							  if(respx != null) 
+							  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+							  msg = new Message(obj, myReq, resp);
+							
+							}
+				}
+				else 
+				{
+					sendLocX2 = this.holes.peek().getX();
+					sendLocY2 = this.holes.peek().getY();
+					if(this.getMemory().getSimulationTime()%5==0)
+						msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+					else
+					{
+						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+						  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+						  double tiledistance;
+						  if(tile !=null)
+						  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+						  else tiledistance = 10000000;
+						  double holedistance;
+						  if(hole != null)
+						  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+						  else holedistance = 10000000;
+						  if(tiledistance>=holedistance)
+							  respx = hole;
+						  else respx = tile; 
+						  if(respx != null)
+						  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+						  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+					}
+				}
+			}			
+			
+		}
+		if(this.currIntention.getIntentionType().equals(IntentionType.REFUEL))
+		{
+			System.out.println("Entering refuel");
+			TWEntity tile;
+			TWEntity hole;
+			TWEntity respx;
+			TWAgentPercept obj = null;
+			
+			sendLocX2 = 0;
+			sendLocY2 = 0; 
+			if(this.getMemory().getSimulationTime()%5==0)
+				msg = new Message(this.getX(), this.getY(), sendLocX2, sendLocY2, resp);
+			else
+			{
+				tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
+				  hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
+				  double tiledistance;
+				  if(tile !=null)
+				  {tiledistance = tile.getDistanceTo(locotherx, locothery);}
+				  else tiledistance = 10000000;
+				  double holedistance;
+				  if(hole != null)
+				  {holedistance = hole.getDistanceTo(locotherx, locothery);}
+				  else holedistance = 10000000;
+				  if(tiledistance>=holedistance)
+					  respx = hole;
+				  else respx = tile; 
+				  if(respx != null) 
+				  obj = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
+				  msg = new Message(obj, resp, sendLocX2, sendLocY2);
+			}
+		}
+		PostBox.put(this.name, msg);
+				
 	}
 
 
@@ -318,7 +992,11 @@ public class UtilityAgent2 extends TWAgent{
 					double neightbourUtility = normalDistribution(utilities[k][l], 0, parameters.get(UtilityParams.DEVIATION_NEIGHBOUR), distance / maxDistance);
 
 					//update the object utility
-					currObj.setUtility(combineUtilities(currObj.getUtility(), neightbourUtility));
+					if (currObj.getX() == loctargetx && currObj.getY() == loctargety)
+						{currObj.setUtility(0.0); 
+						System.out.println("INTENTION CLASH!!");
+						}
+					else currObj.setUtility(combineUtilities(currObj.getUtility(), neightbourUtility));
 				}
 			}
 
@@ -327,8 +1005,7 @@ public class UtilityAgent2 extends TWAgent{
 			currObj.setUtility(currObj.getUtility() * pathLengthAdjustment);
 			if(currObj instanceof TWTile)
 				tiles.add((TWTile) currObj);
-			else
-				holes.add((TWHole) currObj);
+			else holes.add((TWHole) currObj);
 		}
 	}
 
@@ -466,6 +1143,8 @@ public class UtilityAgent2 extends TWAgent{
 
 
 	private Int2D getExploreLocation() {
+		
+		Int2D locother = new Int2D(locotherx, locothery);
 		
 		if(locationSnaps.size() <= 1)
 			return getRandomLocation();
@@ -625,6 +1304,7 @@ public class UtilityAgent2 extends TWAgent{
 		double result = 0.5 *(Math.log(1+x)-Math.log(1-x));
 		return result;
 	}
+	
 }
 
 

@@ -217,7 +217,7 @@ public class TWAgentWorkingMemory {
     /**
      * @return
      */
-    private double getSimulationTime() {
+    public double getSimulationTime() {
         return schedule.getTime();
     }
 
@@ -268,7 +268,7 @@ public class TWAgentWorkingMemory {
      * @param type the class of object we're looking for (Must inherit from TWObject, specifically tile or hole)
      * @return
      */
-    private TWObject getNearbyObject(int sx, int sy, double threshold, Class<?> type) {
+    public TWObject getNearbyObject(int sx, int sy, double threshold, Class<?> type) {
 
         //If we cannot find an object which we have seen recently then we want
         //the one with maxTimestamp

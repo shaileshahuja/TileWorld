@@ -17,11 +17,11 @@ package tileworld;
 public class Parameters {
 
     //Simulation Parameters
-    public final static int seed = 4162012; //no effect with gui
+    public final static int seed = 9042014; //no effect with gui
     public static final long endTime = 5000; //no effect with gui
 
     //Agent Parameters
-    public static final int defaultFuelLevel = 400;
+    public static final int defaultFuelLevel = 1000;
     public static final int defaultSensorRange = 3;
 
     //Environment Parameters

@@ -209,23 +209,25 @@ public class UtilityAgent2 extends TWAgent{
 		this.msgReceived = PostBox.get(this.name);
 		// put message into internal memory
 		if(msgReceived != null){
-			System.out.println("We have received a message");
+			//System.out.println("We have received a message");
 		if(msgReceived.getX() >-1 && msgReceived.getY()>-1){
 			locotherx = msgReceived.getX();
 			locothery = msgReceived.getY();
-			System.out.println("We have received the other's location");
+			//System.out.println("We have received the other's location");
 		}
 		if(msgReceived.getX2() >-1 && msgReceived.getY2() >-1)
 		{
 			loctargetx = msgReceived.getX2();
 			loctargety = msgReceived.getY2();
-			System.out.println("We have received the other's target");
+			//System.out.println("We have received the other's target");
+			if(currIntention != null &&currIntention.getIntentionType() != IntentionType.REFUEL && loctargetx == currIntention.getLocation().getX() && loctargety == currIntention.getLocation().getY())
+				System.out.println("INTENTION CLASH - LOCTARGETX,Y = " + loctargetx + "," + loctargety + "Our intention = " + currIntention.getLocation());
 
 		}
 		
 		if(msgReceived.getRequest()!="" && msgReceived.getRequest()!=null){
 			curRequest = msgReceived.getRequest();
-			System.out.println("We have received the other's request");
+			//System.out.println("We have received the other's request");
 		}
 		else{ curRequest = null;}
 		if(msgReceived.getObs1()!=null && ((msgReceived.getObs1().getO() instanceof TWObstacle) || (msgReceived.getObs1().getO() instanceof TWHole) || (msgReceived.getObs1().getO() instanceof TWTile))){
@@ -237,7 +239,7 @@ public class UtilityAgent2 extends TWAgent{
 			}}
 			else
 				this.getMemory().updateMemory(msgReceived.getObs1());
-			System.out.println("We have received the other's object that's sent");
+			//System.out.println("We have received the other's object that's sent");
 
 		}
 		if(msgReceived.getResponse()!=null && ((msgReceived.getResponse().getO() instanceof TWObstacle) || (msgReceived.getResponse().getO() instanceof TWHole) || (msgReceived.getResponse().getO() instanceof TWTile))){
@@ -248,7 +250,7 @@ public class UtilityAgent2 extends TWAgent{
 				this.getMemory().updateMemory(msgReceived.getResponse());
 			}}
 			else this.getMemory().updateMemory(msgReceived.getResponse());
-			System.out.println("We have received the other's response to request");
+			//System.out.println("We have received the other's response to request");
 
 		}
 		}
@@ -321,7 +323,7 @@ public class UtilityAgent2 extends TWAgent{
 	}
 	private void sendMsg(){
 		// create message to send using a variety of things
-		System.out.println("Entering Send");
+		//System.out.println("Entering Send");
 		TWAgentPercept resp = null;
 		int sendLocX2;
 		int sendLocY2;
@@ -374,7 +376,6 @@ public class UtilityAgent2 extends TWAgent{
 		
 		if(curRequest == null || curRequest == "")
 		{
-			System.out.println("Entering currequest==null");
 			CheckBoundary();
 			Random r = new Random(Parameters.seed);
 			TWObstacle obst;
@@ -408,9 +409,9 @@ public class UtilityAgent2 extends TWAgent{
 			
 				
 		}
-		System.out.println("Intention in sendmsg " + this.currIntention.getIntentionType());
+		//System.out.println("Intention in sendmsg " + this.currIntention.getIntentionType());
 		if(this.currIntention.getIntentionType().equals(IntentionType.EXPLORE)){
-			System.out.println("Entering explore");
+			//System.out.println("Entering explore");
 			TWEntity tile;
 			TWEntity hole;
 			TWEntity respx;
@@ -418,7 +419,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(this.carriedTiles.size()==3) myReq = "HOLE";
 			else if(carriedTiles.size()==0) myReq = "TILE";
 			else myReq = "ANYTHING";
-			if(this.getMemory().getSimulationTime()%45==0)  /////////////change modulus 30 based on environment size. 
+			if(this.getMemory().getSimulationTime()%30==0)  /////////////LOWER NUMBER INSTEAD OF 30- MORE CLASHES RECOGNIZED. BUT FEWER REQUESTS. THERE IS A TRADE OFF. change modulus 30 based on environment size. 
 			{
 				sendLocX2 = this.currIntention.getLocation().getX();
 				sendLocY2 = this.currIntention.getLocation().getY();
@@ -471,12 +472,12 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(this.currIntention.getIntentionType().equals(IntentionType.PICKUPTILE))
 		{
-			System.out.println("Entering pickup");
+			//System.out.println("Entering pickup");
 			TWEntity tile;
 			TWEntity hole;
 			TWEntity respx;
 			TWAgentPercept obj = null;
-			if(this.memory.getSimulationTime() % 45 == 0) /////change modulus to higher numbers for bigger environments. 
+			if(this.memory.getSimulationTime() % 30 == 0) /////LOWER NUMBER - Recognizes more clashes but fewer requests made. hence, there is a trade off. change modulus to higher numbers for bigger environments. 
 			{
 				sendLocX2 = this.tiles.peek().getX();
 				sendLocY2 = this.tiles.peek().getY();
@@ -673,14 +674,14 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(this.currIntention.getIntentionType().equals(IntentionType.FILLHOLE))
 		{
-			System.out.println("Entering fill");
+			//System.out.println("Entering fill");
 
 			TWEntity tile;
 			TWEntity hole;
 			TWEntity respx;
 			TWAgentPercept obj = null;
 			
-			if(this.memory.getSimulationTime() %45 == 0)  ////change modulus to bigger numbers for bigger environments 
+			if(this.memory.getSimulationTime() %30 == 0)  ////lower number means they recognize intention clashes more often BUT they send fewer requests. There is a trade off. 
 			{
 				sendLocX2 = this.holes.peek().getX();
 				sendLocY2 = this.holes.peek().getY();
@@ -965,7 +966,11 @@ public class UtilityAgent2 extends TWAgent{
 					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_TILES), (distance/maxDistance)) * decayMultiplier;
 				if(currObj instanceof TWHole)
 					utilities[i][j] = normalDistribution(100, 0, parameters.get(UtilityParams.DEVIATION_HOLES), (distance/maxDistance)) * decayMultiplier;
-				currObj.setUtility(utilities[i][j]); //maintain a copy of utility
+				if (currObj.getX() == loctargetx && currObj.getY() == loctargety)
+				{currObj.setUtility(0.0); 
+				//System.out.println("INTENTION CLASH!!");
+				}
+				else currObj.setUtility(utilities[i][j]); //maintain a copy of utility
 			}
 		}
 		int xSearchLimit = parameters.get(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X).intValue();
@@ -994,7 +999,7 @@ public class UtilityAgent2 extends TWAgent{
 					//update the object utility
 					if (currObj.getX() == loctargetx && currObj.getY() == loctargety)
 						{currObj.setUtility(0.0); 
-						System.out.println("INTENTION CLASH!!");
+						//System.out.println("INTENTION CLASH!!");
 						}
 					else currObj.setUtility(combineUtilities(currObj.getUtility(), neightbourUtility));
 				}
@@ -1006,7 +1011,10 @@ public class UtilityAgent2 extends TWAgent{
 			if(currObj instanceof TWTile)
 				tiles.add((TWTile) currObj);
 			else holes.add((TWHole) currObj);
+			
 		}
+		//if(tiles.size() != 0 && holes.size() != 0)
+		//System.out.println("Utility of top tile: " + tiles.peek().getUtility() + "Utility of top hole: " + holes.peek().getUtility());
 	}
 
 	public double pickUpTile()

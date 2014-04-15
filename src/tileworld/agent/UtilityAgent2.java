@@ -8,6 +8,8 @@
 package tileworld.agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -56,8 +58,7 @@ public class UtilityAgent2 extends TWAgent{
 	private Intention currIntention = null;
 	private AstarPathGenerator pathGenerator;
 	private TWRefuelPathGenerator fuelPathGen;
-	private LinkedList<Int2D> locationSnaps;
-	private ArrayList<Int2D> corners;
+	private LinkedList<Int2D> mySnaps, otherSnaps;
 	private int xboundary1;
 	private int yboundary1;
 	private int xboundary2;
@@ -71,7 +72,7 @@ public class UtilityAgent2 extends TWAgent{
 	private Message msgToSend;
 	private String curRequest;
 	private int locotherx = 0, locothery = 0;
-	private int loctargetx = 0, loctargety =0;
+	private int loctargetx = 0, loctargety = 0;
 	
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
@@ -81,12 +82,8 @@ public class UtilityAgent2 extends TWAgent{
 		fuelPathGen = new TWRefuelPathGenerator(this);
 		this.parameters = parameters;
 		this.name = name;
-		this.locationSnaps = new LinkedList<Int2D>();
-		this.corners = new ArrayList<Int2D>(4); //doesn't do anything for now. it's use has been commented out. 
-		corners.add(new Int2D(Parameters.defaultSensorRange, Parameters.defaultSensorRange));
-		corners.add(new Int2D(Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
-		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, Parameters.defaultSensorRange));
-		corners.add(new Int2D(getEnvironment().getxDimension() - Parameters.defaultSensorRange, getEnvironment().getyDimension() - Parameters.defaultSensorRange));
+		this.mySnaps = new LinkedList<Int2D>();
+		this.otherSnaps = new LinkedList<Int2D>();
 		
 	}
 	
@@ -97,6 +94,24 @@ public class UtilityAgent2 extends TWAgent{
 	}
 
 	protected TWThought think() {
+		
+		//store past locations
+		Int2D snap = snapToCheckpoint(x, y);
+		if(mySnaps.size() == 0 || !mySnaps.peekFirst().equals(snap))
+		{
+			mySnaps.addFirst(snap);
+			if(mySnaps.size() > 20)
+				mySnaps.removeLast();
+		}
+		//store other agents locations
+		snap = snapToCheckpoint(locotherx, locothery);
+		if(otherSnaps.size() == 0 || !otherSnaps.peekFirst().equals(snap))
+		{
+			otherSnaps.addFirst(snap);
+			if(otherSnaps.size() > 20)
+				otherSnaps.removeLast();
+		}
+		
 		//High prio reactive
 		TWEntity current = (TWEntity) getMemory().getObjectAt(x, y);		
 		if(carriedTiles.size() < 3 & current instanceof TWTile)
@@ -140,15 +155,6 @@ public class UtilityAgent2 extends TWAgent{
 			else System.out.println("Current Plan is to wait");
 			System.out.println(this.getScore());
 			System.out.println(this.getFuelLevel());
-		}
-		
-
-		//store past locations
-		if(getEnvironment().schedule.getSteps() % parameters.get(UtilityParams.GAP_LOCATION_SNAP).intValue() == 0)
-		{
-			locationSnaps.add(new Int2D(x, y));
-			if(locationSnaps.size() > 5)
-				locationSnaps.remove();
 		}
 		
 		return currentPlan.next();
@@ -1058,17 +1064,21 @@ public class UtilityAgent2 extends TWAgent{
 
 	private HashMap<IntentionType, Double> options() {
 		HashMap<IntentionType, Double> utilities = new HashMap<IntentionType, Double>();
-		utilities.put(IntentionType.REFUEL, fueling());
-		utilities.put(IntentionType.PICKUPTILE, pickUpTile());
-		utilities.put(IntentionType.FILLHOLE, putInHole());
+		double sticky = parameters.get(UtilityParams.UTILITY_STICKY);
+		IntentionType curInt = currIntention == null? IntentionType.OTHER: currIntention.getIntentionType();
+		utilities.put(IntentionType.REFUEL, Math.min(100, fueling() + (curInt.equals(IntentionType.REFUEL)? sticky: 0)));
+		utilities.put(IntentionType.PICKUPTILE, Math.min(100, pickUpTile() + (curInt.equals(IntentionType.PICKUPTILE)? sticky: 0)));
+		utilities.put(IntentionType.FILLHOLE, Math.min(100, putInHole() + (curInt.equals(IntentionType.FILLHOLE)? sticky: 0)));
 		return utilities;
 	}
 
 	private Intention filter(HashMap<IntentionType, Double> utilities) {
 		boolean explore = true;
+		IntentionType curInt = currIntention == null? IntentionType.OTHER: currIntention.getIntentionType();
+		double threshold = parameters.get(UtilityParams.THRESHOLD_EXPLORE) + (curInt.equals(IntentionType.EXPLORE)? parameters.get(UtilityParams.UTILITY_STICKY): 0);
 		for(Double value: utilities.values())
 		{
-			if(value > parameters.get(UtilityParams.THRESHOLD_EXPLORE))
+			if(value > threshold)
 				explore = false;
 		}
 		if (explore)
@@ -1149,38 +1159,93 @@ public class UtilityAgent2 extends TWAgent{
 		return new TWPlan(thoughts);
 	}
 
-
+//	private Int2D getExploreLocation_old()
+//	{
+//		if(locationSnaps.size() <= 1)
+//			return getRandomLocation();
+//		
+//		//return end location in a straight line
+//		Int2D cur = new Int2D(x, y);
+//		Int2D prev = locationSnaps.getLast();
+//		Int2D prev2 = locationSnaps.get(locationSnaps.size() - 2);
+//		if(getEnvironment().getDistance(x, y, prev.x, prev.y) < parameters.get(UtilityParams.GAP_LOCATION_SNAP) / 2)
+//		{
+//			Int2D location1 = getLocationByDirection(cur, prev);
+//			if(location1 != null)
+//				return location1;
+//		}
+//		else
+//		{
+//			Int2D location2 = getLocationByDirection(prev, prev2);
+//			if(location2 != null)
+//				return location2;
+//		}
+//			
+//		//if we are already at the end		
+//		Int2D[] from = new Int2D[locationSnaps.size() + 1];
+//		from = locationSnaps.toArray(from);
+//		from[locationSnaps.size()] = new Int2D(x, y);
+//		return getFarthestRandomLocation(from);
+//	}
+	
 	private Int2D getExploreLocation() {
-		
-		Int2D locother = new Int2D(locotherx, locothery);
-		
-		if(locationSnaps.size() <= 1)
-			return getRandomLocation();
-		
-		//return end location in a straight line
-		Int2D cur = new Int2D(x, y);
-		Int2D prev = locationSnaps.getLast();
-		Int2D prev2 = locationSnaps.get(locationSnaps.size() - 2);
-		if(getEnvironment().getDistance(x, y, prev.x, prev.y) < parameters.get(UtilityParams.GAP_LOCATION_SNAP) / 2)
+		Int2D locother = snapToCheckpoint(locotherx, locothery);
+		Int2D targetOther = snapToCheckpoint(loctargetx, loctargety);
+		ArrayList<Int2D> neighbourSnaps = getNeighbourSnaps();
+		int maxAt = 0;
+		int maxPriority = Integer.MIN_VALUE;
+		for(int i = 0; i < neighbourSnaps.size(); i++)
 		{
-			Int2D location1 = getLocationByDirection(cur, prev);
-			if(location1 != null)
-				return location1;
-		}
-		else
-		{
-			Int2D location2 = getLocationByDirection(prev, prev2);
-			if(location2 != null)
-				return location2;
-		}
-			
-		//if we are already at the end		
-		Int2D[] from = new Int2D[locationSnaps.size() + 1];
-		from = locationSnaps.toArray(from);
-		from[locationSnaps.size()] = new Int2D(x, y);
-		return getFarthestRandomLocation(from);
+			int priority = getSnapPriority(neighbourSnaps.get(i), locother, targetOther);
+			if(priority > maxPriority)
+			{
+				maxPriority = priority;
+				maxAt = i;
+			}
+		}		
+		return neighbourSnaps.get(maxAt);
 	}
-
+	
+	private int getSnapPriority(Int2D snap, Int2D locother, Int2D targetOther)
+	{
+		if(!getEnvironment().isInBounds(snap.x, snap.y))
+			return Integer.MIN_VALUE;
+		if(snap.equals(locother) || snap.equals(targetOther))
+			return 0;
+		int myIndex = mySnaps.indexOf(snap);
+		int otherIndex = otherSnaps.indexOf(snap);
+		if(myIndex == -1)
+			myIndex = Integer.MAX_VALUE;
+		if(otherIndex == -1)
+			otherIndex = Integer.MAX_VALUE;
+		return Math.min(myIndex, otherIndex) - 1;
+	}
+	
+	private ArrayList<Int2D> getNeighbourSnaps()
+	{
+		int length = Parameters.defaultSensorRange * 2 + 1;
+		Int2D current = mySnaps.peekFirst();
+		ArrayList<Int2D> snaps = new ArrayList<Int2D>(Arrays.asList(new Int2D[] {snapToCheckpoint(current.x + length, current.y), snapToCheckpoint(current.x - length, current.y), 
+				snapToCheckpoint(current.x, current.y + length), snapToCheckpoint(current.x, current.y - length)}));
+		Collections.shuffle(snaps);
+		return snaps;
+	}
+	private Int2D snapToCheckpoint(int xp, int yp)
+	{
+		int range = Parameters.defaultSensorRange;
+		int length = 2*range + 1;
+		int xCheck, yCheck;
+		if(xp >= getEnvironment().getxDimension() - length)
+			xCheck = getEnvironment().getxDimension() - length;
+		else
+			xCheck = xp/length * length;
+		if(yp >= getEnvironment().getyDimension() - length)
+			yCheck = getEnvironment().getyDimension() - length;
+		else
+			yCheck = yp/length * length;
+		return new Int2D(xCheck + range, yCheck + range);
+		
+	}
 	private Int2D getFarthestRandomLocation(Int2D[] from) {
 		Int2D farthest = null;
 		int maxD = 0;
@@ -1221,23 +1286,6 @@ public class UtilityAgent2 extends TWAgent{
 			return new Int2D(cur.x + (int)Math.round(speedX * timeY), endY);
 		}
 		return null;
-	}
-
-	private Int2D getFarthestCorner(Int2D[] from) { //function does nothing. Function call has been commented out somewhere above. 
-		Int2D farthest = null;
-		int maxD = 0;
-		for(Int2D corner: corners)
-		{
-			int distance = 0;
-			for(Int2D point: from)
-				distance += getEnvironment().getDistance(corner.x, corner.y, point.x, point.y);
-			if(distance > maxD)
-			{
-				farthest = corner;
-				maxD = distance;
-			}
-		}
-		return farthest;
 	}
 
 	private Int2D getRandomLocation()

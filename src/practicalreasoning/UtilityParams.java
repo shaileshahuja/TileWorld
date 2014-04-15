@@ -72,6 +72,11 @@ public class UtilityParams {
 	 */
 	public static final String GAP_LOCATION_SNAP = "locationSnapGap";
 	
+	/**
+	 * Integer Range 5 to 20
+	 */
+	public static final String UTILITY_STICKY = "stickyUtility";
+	
 	public static HashMap<String, Double> defaultParams()
 	{
 		HashMap<String, Double> params = new HashMap<String, Double>();
@@ -92,6 +97,7 @@ public class UtilityParams {
 		params.put(DECAY_MEMORY_AFTER, 50.0);
 		params.put(THRESHOLD_EXPLORE, 10.0);
 		params.put(GAP_LOCATION_SNAP, 10.0);
+		params.put(UTILITY_STICKY, 5.0);
 		return params;
 	}
 	
@@ -115,6 +121,7 @@ public class UtilityParams {
 		params.put(DECAY_MEMORY_AFTER, 50.0);
 		params.put(THRESHOLD_EXPLORE, 10.0);
 		params.put(GAP_LOCATION_SNAP, 10.0);
+		params.put(UTILITY_STICKY, 5.0);
 		return params;
 	}
 }

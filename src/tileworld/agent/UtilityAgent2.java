@@ -16,6 +16,8 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Random;
 
+import javax.rmi.CORBA.Util;
+
 import practicalreasoning.Intention;
 import practicalreasoning.IntentionType;
 import practicalreasoning.TWPlan;
@@ -103,7 +105,7 @@ public class UtilityAgent2 extends TWAgent{
 		if(mySnaps.size() == 0 || !mySnaps.peekFirst().equals(snap))
 		{
 			mySnaps.addFirst(snap);
-			if(mySnaps.size() > 20)
+			if(mySnaps.size() > parameters.get(UtilityParams.LENGTH_SNAPS))
 				mySnaps.removeLast();
 		}
 		//store other agents locations
@@ -111,7 +113,7 @@ public class UtilityAgent2 extends TWAgent{
 		if(otherSnaps.size() == 0 || !otherSnaps.peekFirst().equals(snap))
 		{
 			otherSnaps.addFirst(snap);
-			if(otherSnaps.size() > 20)
+			if(otherSnaps.size() > parameters.get(UtilityParams.LENGTH_SNAPS))
 				otherSnaps.removeLast();
 		}
 

@@ -68,9 +68,9 @@ public class UtilityParams {
 	public static final String THRESHOLD_EXPLORE = "exploreThreshold";
 
 	/**
-	 * Range 1 to environment's dimension/3. Currently max can be assumed to be 20.
+	 * Interger Range 5 to 100. 
 	 */
-	public static final String GAP_LOCATION_SNAP = "locationSnapGap";
+	public static final String LENGTH_SNAPS = "snapsLength";
 	
 	/**
 	 * Integer Range 5 to 20
@@ -96,7 +96,7 @@ public class UtilityParams {
 		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
 		params.put(DECAY_MEMORY_AFTER, 50.0);
 		params.put(THRESHOLD_EXPLORE, 10.0);
-		params.put(GAP_LOCATION_SNAP, 10.0);
+		params.put(LENGTH_SNAPS, 20.0);
 		params.put(UTILITY_STICKY, 5.0);
 		return params;
 	}
@@ -120,7 +120,7 @@ public class UtilityParams {
 		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
 		params.put(DECAY_MEMORY_AFTER, 50.0);
 		params.put(THRESHOLD_EXPLORE, 10.0);
-		params.put(GAP_LOCATION_SNAP, 10.0);
+		params.put(LENGTH_SNAPS, 20.0);
 		params.put(UTILITY_STICKY, 5.0);
 		return params;
 	}

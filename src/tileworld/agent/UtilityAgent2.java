@@ -894,7 +894,8 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(this.currIntention.getIntentionType().equals(IntentionType.REFUEL))
 		{
-			System.out.println("Entering refuel");
+			if(DEBUG)
+				System.out.println("Entering refuel");
 			TWEntity tile;
 			TWEntity hole;
 			TWEntity respx;
@@ -997,7 +998,7 @@ public class UtilityAgent2 extends TWAgent{
 				continue;
 			int i = currObj.getX();
 			int j = currObj.getY();
-			
+
 			if(utilities[i][j] < parameters.get(UtilityParams.THRESHOLD_EXPLORE))
 				continue;
 			if(pathLengthAdjustment)
@@ -1029,7 +1030,7 @@ public class UtilityAgent2 extends TWAgent{
 			//add adjustment for the expected path length
 			if(pathLengthAdjustment)				
 				pathFactor = getDistanceTo(currObj) / currObj.getPathTo().size();
-			
+
 			if (currObj.getX() == loctargetx && currObj.getY() == loctargety)
 			{
 				//System.out.println("INTENTION CLASH!!");
@@ -1160,15 +1161,18 @@ public class UtilityAgent2 extends TWAgent{
 			break;
 		case REFUEL:
 			path = fuelPathGen.generateRefuelPath();
-			if(path == null) //test code
-				System.out.print("No path available");
-			else {
-				for (int z = 0; z<path.size(); z++)
-				{
-					System.out.print(path.getStep(z).getDirection());
-				}
-				break;
-			} //end of test code
+			if(DEBUG)
+			{	
+				if(path == null) //test code
+					System.out.print("No path available");
+				else {
+					for (int z = 0; z<path.size(); z++)
+					{
+						System.out.print(path.getStep(z).getDirection());
+					}
+					break;
+				} //end of test code
+			}
 		}
 		if(path == null || !path.hasNext())
 		{

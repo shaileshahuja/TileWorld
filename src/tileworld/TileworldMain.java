@@ -28,7 +28,7 @@ import tileworld.environment.TWEnvironment;
  */
 public class TileworldMain {
 
-    public static void main3(String args[]) {
+    public static void main(String args[]) {
         
         TWEnvironment tw = new TWEnvironment(Parameters.seed);
         tw.start();
@@ -141,7 +141,7 @@ public class TileworldMain {
     <steps>.<job#>.Tutorial1.checkpoint
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         SimState.doLoop(TWEnvironment.class, args);
         System.exit(0);
     }

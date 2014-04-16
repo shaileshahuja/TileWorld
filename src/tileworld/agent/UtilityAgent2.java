@@ -428,7 +428,7 @@ public class UtilityAgent2 extends TWAgent{
 			if(this.carriedTiles.size()==3) myReq = "HOLE";
 			else if(carriedTiles.size()==0) myReq = "TILE";
 			else myReq = "ANYTHING";
-			if(this.getMemory().getSimulationTime()%30==0)  /////////////LOWER NUMBER INSTEAD OF 30- MORE CLASHES RECOGNIZED. BUT FEWER REQUESTS. THERE IS A TRADE OFF. change modulus 30 based on environment size. 
+			if(this.getMemory().getSimulationTime()%3==0)  /////////////LOWER NUMBER INSTEAD OF 30- MORE CLASHES RECOGNIZED. BUT FEWER REQUESTS. THERE IS A TRADE OFF. change modulus 30 based on environment size. 
 			{
 				sendLocX2 = this.currIntention.getLocation().getX();
 				sendLocY2 = this.currIntention.getLocation().getY();
@@ -486,7 +486,7 @@ public class UtilityAgent2 extends TWAgent{
 			TWEntity hole;
 			TWEntity respx;
 			TWAgentPercept obj = null;
-			if(this.memory.getSimulationTime() % 30 == 0) /////LOWER NUMBER - Recognizes more clashes but fewer requests made. hence, there is a trade off. change modulus to higher numbers for bigger environments. 
+			if(this.memory.getSimulationTime() % 3 == 0) /////LOWER NUMBER - Recognizes more clashes but fewer requests made. hence, there is a trade off. change modulus to higher numbers for bigger environments. 
 			{
 				sendLocX2 = this.tiles.peek().getX();
 				sendLocY2 = this.tiles.peek().getY();
@@ -690,7 +690,7 @@ public class UtilityAgent2 extends TWAgent{
 			TWEntity respx;
 			TWAgentPercept obj = null;
 			
-			if(this.memory.getSimulationTime() %30 == 0)  ////lower number means they recognize intention clashes more often BUT they send fewer requests. There is a trade off. 
+			if(this.memory.getSimulationTime() %3 == 0)  ////lower number means they recognize intention clashes more often BUT they send fewer requests. There is a trade off. 
 			{
 				sendLocX2 = this.holes.peek().getX();
 				sendLocY2 = this.holes.peek().getY();
@@ -941,9 +941,11 @@ public class UtilityAgent2 extends TWAgent{
 	public double fueling() //calculates fuel utility
 	{
 		double fuelLevel = getFuelLevel();
+		if(x + y <= Parameters.defaultSensorRange * 2 && fuelLevel/Parameters.defaultFuelLevel <= 0.5)
+			return 70;
 		if((Parameters.endTime - getEnvironment().schedule.getTime()) <= fuelLevel)
 			return 0;
-		double bufferFuelDeviation = (this.getX()+ this.getY())*parameters.get(UtilityParams.BUFFER_RATIO); 
+		double bufferFuelDeviation = (x + y)*parameters.get(UtilityParams.BUFFER_RATIO); 
 		double distance = getDistanceTo(getEnvironment().getFuelingStation()); //nothing has been changed after this. 
 //		//reactive
 		return normalDistribution(100, 0, bufferFuelDeviation, fuelLevel - distance);

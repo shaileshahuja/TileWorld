@@ -128,7 +128,7 @@ public class TWEnvironment extends SimState implements Steppable {
         this.agents = new ArrayList<TWAgent>();
         
         agents.add(new UtilityAgent2("First", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(0)));
-        agents.add(new UtilityAgent2("Second", 0, 0, this, Parameters.defaultFuelLevel, parameters.get(1)));
+        agents.add(new UtilityAgent2("Second", 1, 1, this, Parameters.defaultFuelLevel, parameters.get(1)));
         
         int i = 2;
         for(TWAgent agent: agents)

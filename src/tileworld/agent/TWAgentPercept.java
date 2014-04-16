@@ -103,4 +103,8 @@ public class TWAgentPercept{
     @Override
     public boolean equals(Object o) {return sameObject(o);}
 	
+    @Override
+    public String toString() {
+    	return o.toString() + " at " + t;
+    }
 }

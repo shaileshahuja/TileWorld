@@ -4,6 +4,7 @@
 package tileworld.environment;
 
 import java.awt.Color;
+
 import sim.portrayal.Portrayal;
 import sim.portrayal.simple.RectanglePortrayal2D;
 import sim.util.Int2D;
@@ -48,4 +49,9 @@ public TWTile() {}
         return new RectanglePortrayal2D(new Color(0.0f,1.0f,0.0f), true);
     }
 
+         @Override
+        public String toString() {
+        	return "Tile (" + x + ", " + y + ")";
+        }
+         
 }

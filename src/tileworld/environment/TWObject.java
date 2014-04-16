@@ -89,6 +89,4 @@ public class TWObject extends TWEntity implements Comparable<TWObject>{
 		this.utility = utility;
 	}
 
-	
-
 }

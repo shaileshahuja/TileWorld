@@ -1,6 +1,7 @@
 package tileworld.environment;
 
 import java.awt.Color;
+
 import sim.portrayal.Portrayal;
 import sim.portrayal.simple.RectanglePortrayal2D;
 import sim.util.Int2D;
@@ -51,4 +52,11 @@ public class TWHole extends TWObject{
 
     public TWHole() {
     }
+    
+
+    @Override
+   public String toString() {
+   	return "Hole (" + x + ", " + y + ")";
+   }
+    
 }

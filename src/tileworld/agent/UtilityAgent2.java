@@ -59,6 +59,7 @@ public class UtilityAgent2 extends TWAgent{
 	private AstarPathGenerator pathGenerator;
 	private TWRefuelPathGenerator fuelPathGen;
 	private LinkedList<Int2D> mySnaps, otherSnaps;
+	private boolean intentionChanged = false;
 	private int xboundary1;
 	private int yboundary1;
 	private int xboundary2;
@@ -131,6 +132,7 @@ public class UtilityAgent2 extends TWAgent{
 			HashMap<IntentionType, Double> utilities = options();
 			currIntention = filter(utilities);	
 			currentPlan = plan(currIntention);
+			intentionChanged = true;
 		}
 		else
 		{
@@ -144,6 +146,7 @@ public class UtilityAgent2 extends TWAgent{
 			{
 				currentPlan = plan(newIntention);
 				currIntention = newIntention;
+				intentionChanged = true;
 			}
 		}
 		if(DEBUG)

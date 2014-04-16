@@ -22,7 +22,7 @@ public class Parameters {
 
     //Agent Parameters
     public static final int defaultFuelLevel = 1000;
-    public static final int defaultSensorRange = 5;
+    public static final int defaultSensorRange = 3;
 
     //Environment Parameters for ENV 3
     public static final int xDimension = 150; //size in cells

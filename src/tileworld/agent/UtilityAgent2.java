@@ -428,8 +428,10 @@ public class UtilityAgent2 extends TWAgent{
 			if(this.carriedTiles.size()==3) myReq = "HOLE";
 			else if(carriedTiles.size()==0) myReq = "TILE";
 			else myReq = "ANYTHING";
-			if(this.getMemory().getSimulationTime()%3==0)  /////////////LOWER NUMBER INSTEAD OF 30- MORE CLASHES RECOGNIZED. BUT FEWER REQUESTS. THERE IS A TRADE OFF. change modulus 30 based on environment size. 
+			//if(this.getMemory().getSimulationTime()%3==0)  /////////////LOWER NUMBER INSTEAD OF 30- MORE CLASHES RECOGNIZED. BUT FEWER REQUESTS. THERE IS A TRADE OFF. change modulus 30 based on environment size. 
+			if(this.intentionChanged == true)
 			{
+				this.intentionChanged = false;
 				sendLocX2 = this.currIntention.getLocation().getX();
 				sendLocY2 = this.currIntention.getLocation().getY();
 				if(this.getMemory().getSimulationTime()%5==0)
@@ -486,8 +488,10 @@ public class UtilityAgent2 extends TWAgent{
 			TWEntity hole;
 			TWEntity respx;
 			TWAgentPercept obj = null;
-			if(this.memory.getSimulationTime() % 3 == 0) /////LOWER NUMBER - Recognizes more clashes but fewer requests made. hence, there is a trade off. change modulus to higher numbers for bigger environments. 
+			//if(this.memory.getSimulationTime() % 3 == 0) /////LOWER NUMBER - Recognizes more clashes but fewer requests made. hence, there is a trade off. change modulus to higher numbers for bigger environments. 
+			if(this.intentionChanged == true)
 			{
+				this.intentionChanged = false;
 				sendLocX2 = this.tiles.peek().getX();
 				sendLocY2 = this.tiles.peek().getY();
 				if(this.getMemory().getSimulationTime()%5==0)
@@ -690,8 +694,10 @@ public class UtilityAgent2 extends TWAgent{
 			TWEntity respx;
 			TWAgentPercept obj = null;
 			
-			if(this.memory.getSimulationTime() %3 == 0)  ////lower number means they recognize intention clashes more often BUT they send fewer requests. There is a trade off. 
+			//if(this.memory.getSimulationTime() %3 == 0)  ////lower number means they recognize intention clashes more often BUT they send fewer requests. There is a trade off. 
+			if(this.intentionChanged==true)
 			{
+				this.intentionChanged=false;
 				sendLocX2 = this.holes.peek().getX();
 				sendLocY2 = this.holes.peek().getY();
 				if(this.getMemory().getSimulationTime()%5==0)

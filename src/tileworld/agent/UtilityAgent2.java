@@ -78,6 +78,8 @@ public class UtilityAgent2 extends TWAgent{
 	private String curRequest;
 	private int locotherx = 0, locothery = 0;
 	private int loctargetx = 0, loctargety = 0;
+	TWAgentPercept resp = null;
+	boolean flag = false;
 
 	//private ReactivePathGenerator reactivePathGen;
 	private String name;
@@ -249,7 +251,11 @@ public class UtilityAgent2 extends TWAgent{
 				if(this.memory.getPerceptAt(rx, ry)!=null) 
 				{if(msgReceived.getObs1().getT() > this.memory.getPerceptAt(rx, ry).getT()){
 					this.getMemory().addAgentPercept(msgReceived.getObs1());
-				}}
+				}
+				else{ flag = true;
+					  resp = this.memory.getPerceptAt(rx,ry);
+					}
+				}
 				else
 					this.getMemory().addAgentPercept(msgReceived.getObs1());
 				//System.out.println("We have received the other's object that's sent");
@@ -261,7 +267,13 @@ public class UtilityAgent2 extends TWAgent{
 				if(this.memory.getPerceptAt(rx, ry) !=null)
 				{if(msgReceived.getResponse().getT() > this.memory.getPerceptAt(rx, ry).getT()){
 					this.getMemory().addAgentPercept(msgReceived.getResponse());
-				}}
+				}
+				else {
+					flag = true;
+					if(msgReceived.getResponse().getO() instanceof TWTile || msgReceived.getResponse().getO() instanceof TWHole)
+					resp = this.memory.getPerceptAt(rx,ry);
+					}
+				}
 				else this.getMemory().addAgentPercept(msgReceived.getResponse());
 				//System.out.println("We have received the other's response to request");
 
@@ -337,12 +349,14 @@ public class UtilityAgent2 extends TWAgent{
 	private void sendMsg(){
 		// create message to send using a variety of things
 		//System.out.println("Entering Send");
-		TWAgentPercept resp = null;
 		int sendLocX2;
 		int sendLocY2;
 		String myReq="";
 		Message msg = null;
-
+		
+		
+		if(flag==false)
+		{
 		if(curRequest!=null && curRequest!=""){
 			TWEntity respx;
 			TWEntity tile;
@@ -421,6 +435,7 @@ public class UtilityAgent2 extends TWAgent{
 			}
 
 
+		}
 		}
 		//System.out.println("Intention in sendmsg " + this.currIntention.getIntentionType());
 		if(this.currIntention.getIntentionType().equals(IntentionType.EXPLORE)){
@@ -927,6 +942,7 @@ public class UtilityAgent2 extends TWAgent{
 				msg = new Message(obj, resp, sendLocX2, sendLocY2);
 			}
 		}
+		flag=false;
 		PostBox.put(this.name, msg);
 
 	}
@@ -976,7 +992,7 @@ public class UtilityAgent2 extends TWAgent{
 		{
 			TWAgentPercept percept = getMemory().getPerceptAt(loc.x,  loc.y);
 			TWObject currObj = (TWObject) percept.getO();
-			if(currObj instanceof TWObstacle)
+			if(currObj instanceof TWObstacle || currObj == null)
 				continue;
 			double time = percept.getT();
 			double distance = getDistanceTo(currObj);		

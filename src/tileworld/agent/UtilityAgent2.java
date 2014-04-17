@@ -1278,7 +1278,8 @@ public class UtilityAgent2 extends TWAgent{
 		Int2D current = mySnaps.peekFirst();
 		ArrayList<Int2D> snaps = new ArrayList<Int2D>(Arrays.asList(new Int2D[] {snapToCheckpoint(current.x + length, current.y), snapToCheckpoint(current.x - length, current.y), 
 				snapToCheckpoint(current.x, current.y + length), snapToCheckpoint(current.x, current.y - length)}));
-		Collections.shuffle(snaps);
+		Random r = new Random(Parameters.seed);
+		Collections.shuffle(snaps, r);
 		return snaps;
 	}
 	private Int2D snapToCheckpoint(int xp, int yp)

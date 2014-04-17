@@ -46,6 +46,7 @@ public class TileworldMain {
             }
         }
         tw.finish();
+        System.out.println(tw.getScore());
         System.exit(0);  // make sure any threads finish up
     }
 

@@ -75,7 +75,10 @@ public class TWAgentWorkingMemory {
         {
         	for(j=0;j<y;j++)
         	{
-        		objects[i][j] = new TWAgentPercept(null, 0);       		
+        		Int2D pos = new Int2D(i, j);
+            	TWObject object = new TWObject();
+            	object.setLocation(pos);
+                objects[i][j] = new TWAgentPercept(object, 0);
         	}
         }
         this.schedule = schedule;
@@ -146,7 +149,10 @@ public class TWAgentWorkingMemory {
     	Int2D loc = new Int2D(x, y);
     	if(tilesAndHoles.contains(loc))
     		tilesAndHoles.remove(loc);
-        objects[x][y] = new TWAgentPercept(null, this.getSimulationTime());
+    	TWObject object = new TWObject();
+    	Int2D pos = new Int2D(x, y);
+    	object.setLocation(pos);
+        objects[x][y] = new TWAgentPercept(object, this.getSimulationTime());
     	memoryGrid.set(x, y, null); //memorygrid is never really accessed much by us. 
     }
 

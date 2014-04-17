@@ -56,6 +56,7 @@ public abstract class TWEntity{
 
         x=xpos;y=ypos;
         //Set location of entity when it's created
+        if(environment != null)
         environment.getObjectGrid().set(x, y, this);
     }
 

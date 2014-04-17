@@ -155,7 +155,7 @@ public class UtilityAgent2 extends TWAgent{
 				intentionChanged = true;
 			}
 		}
-		if(DEBUG)
+		if(true)
 		{
 			System.out.print(name + " ");
 			System.out.println(currIntention);
@@ -245,7 +245,7 @@ public class UtilityAgent2 extends TWAgent{
 				//System.out.println("We have received the other's request");
 			}
 			else{ curRequest = null;}
-			if(msgReceived.getObs1()!=null && ((msgReceived.getObs1().getO() instanceof TWObstacle) || (msgReceived.getObs1().getO() instanceof TWHole) || (msgReceived.getObs1().getO() instanceof TWTile))){
+			if(msgReceived.getObs1()!=null){
 				int rx = msgReceived.getObs1().getO().getX();
 				int ry = msgReceived.getObs1().getO().getY();
 				if(this.memory.getPerceptAt(rx, ry)!=null) 
@@ -261,7 +261,7 @@ public class UtilityAgent2 extends TWAgent{
 				//System.out.println("We have received the other's object that's sent");
 
 			}
-			if(msgReceived.getResponse()!=null && ((msgReceived.getResponse().getO() instanceof TWObstacle) || (msgReceived.getResponse().getO() instanceof TWHole) || (msgReceived.getResponse().getO() instanceof TWTile))){
+			if(msgReceived.getResponse()!=null){
 				int rx = msgReceived.getResponse().getO().getX();
 				int ry = msgReceived.getResponse().getO().getY();
 				if(this.memory.getPerceptAt(rx, ry) !=null)
@@ -992,7 +992,7 @@ public class UtilityAgent2 extends TWAgent{
 		{
 			TWAgentPercept percept = getMemory().getPerceptAt(loc.x,  loc.y);
 			TWObject currObj = (TWObject) percept.getO();
-			if(currObj instanceof TWObstacle || currObj == null)
+			if(!(currObj instanceof TWTile || currObj instanceof TWHole))
 				continue;
 			double time = percept.getT();
 			double distance = getDistanceTo(currObj);		
@@ -1012,7 +1012,7 @@ public class UtilityAgent2 extends TWAgent{
 		{
 			TWAgentPercept percept = getMemory().getPerceptAt(loc.x,  loc.y);
 			TWObject currObj = (TWObject) percept.getO();
-			if(currObj instanceof TWObstacle)
+			if(!(currObj instanceof TWTile || currObj instanceof TWHole))
 				continue;
 			int i = currObj.getX();
 			int j = currObj.getY();

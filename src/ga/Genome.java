@@ -14,25 +14,28 @@ import practicalreasoning.UtilityParams;
 public class Genome {
     public HashMap<String, Double> params = new HashMap<String, Double>();
     
-    public static final String index0 = UtilityParams.BUFFER_RATIO;
-    public static final String index1 = UtilityParams.DEVIATION_TILES;
-    public static final String index2 = UtilityParams.DEVIATION_HOLES;
-    public static final String index3 = UtilityParams.DEVIATION_MEM_DECAY;
-    public static final String index4 = UtilityParams.DEVIATION_NEIGHBOUR;
-    public static final String index5 = UtilityParams.WEIGHT_COMBINATION;
-    public static final String index6 = UtilityParams.PICKUP_ZERO_TILES;
-    public static final String index7 = UtilityParams.PICKUP_ONE_TILES;
-    public static final String index8 = UtilityParams.PICKUP_TWO_TILES;
-    public static final String index9 = UtilityParams.PUTDOWN_ONE_TILE;
-    public static final String index10 = UtilityParams.PUTDOWN_TWO_TILES;
-    public static final String index11 = UtilityParams.PUTDOWN_THREE_TILES;
-    public static final String index12 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X;
-    public static final String index13 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y;
-    public static final String index14 = UtilityParams.DECAY_MEMORY_AFTER;
-    public static final String index15 = UtilityParams.THRESHOLD_EXPLORE;
+    //public static final String index0 = UtilityParams.BUFFER_RATIO;
+    public static final String index0 = UtilityParams.DEVIATION_TILES;
+    public static final String index1 = UtilityParams.DEVIATION_HOLES;
+    public static final String index2 = UtilityParams.DEVIATION_MEM_DECAY;
+    //public static final String index4 = UtilityParams.DEVIATION_NEIGHBOUR;
+    public static final String index3 = UtilityParams.WEIGHT_COMBINATION;
+    public static final String index4 = UtilityParams.PICKUP_ZERO_TILES;
+    public static final String index5 = UtilityParams.PICKUP_ONE_TILES;
+    public static final String index6 = UtilityParams.PICKUP_TWO_TILES;
+    public static final String index7 = UtilityParams.PUTDOWN_ONE_TILE;
+    public static final String index8 = UtilityParams.PUTDOWN_TWO_TILES;
+    public static final String index9 = UtilityParams.PUTDOWN_THREE_TILES;
+    public static final String index10 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X;
+    public static final String index11 = UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y;
+    //public static final String index14 = UtilityParams.DECAY_MEMORY_AFTER;
+    public static final String index12 = UtilityParams.THRESHOLD_EXPLORE;
+    public static final String index13 = UtilityParams.LENGTH_SNAPS;
+    public static final String index14 = UtilityParams.UTILITY_STICKY;
+    
     
     public Genome (){
-    	params.put(UtilityParams.BUFFER_RATIO, 0.1);
+    	params.put(UtilityParams.BUFFER_RATIO, 0.2);
 		params.put(UtilityParams.DEVIATION_TILES, 0.3);
 		params.put(UtilityParams.DEVIATION_HOLES, 0.3);
 		params.put(UtilityParams.DEVIATION_MEM_DECAY, 15.0);
@@ -48,6 +51,31 @@ public class Genome {
 		params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
 		params.put(UtilityParams.DECAY_MEMORY_AFTER, 50.0);
 		params.put(UtilityParams.THRESHOLD_EXPLORE, 10.0);
+		params.put(UtilityParams.LENGTH_SNAPS, 20.0);
+		params.put(UtilityParams.UTILITY_STICKY, 5.0);
+    	/*
+		params.put(UtilityParams.DEVIATION_TILES, 0.3);
+		params.put(UtilityParams.DEVIATION_HOLES, 0.3);
+		params.put(UtilityParams.DEVIATION_MEM_DECAY, 15.0);
+		params.put(UtilityParams.PICKUP_ZERO_TILES, 1.0);
+		params.put(UtilityParams.PICKUP_ONE_TILES, 0.66);
+		params.put(UtilityParams.PICKUP_TWO_TILES, 0.33);
+		params.put(UtilityParams.PUTDOWN_ONE_TILE, 0.33);
+		params.put(UtilityParams.PUTDOWN_TWO_TILES, 0.66);
+		params.put(UtilityParams.PUTDOWN_THREE_TILES, 1.0);
+		params.put(UtilityParams.THRESHOLD_EXPLORE, 10.0);
+		params.put(UtilityParams.LENGTH_SNAPS, 20.0);
+		params.put(UtilityParams.UTILITY_STICKY, 5.0);
+		
+		/// Parameters of the agent that are not to be changed by GA
+		params.put(UtilityParams.THRESHOLD_EXPLORE, 10.0);
+		params.put(UtilityParams.BUFFER_RATIO, 0.2);
+		params.put(UtilityParams.DEVIATION_NEIGHBOUR, 0.3);
+		params.put(UtilityParams.WEIGHT_COMBINATION, 5.0);
+		params.put(UtilityParams.DECAY_MEMORY_AFTER, 50.0);
+		params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);*/
+		
     }
     public double getDoubleVal(String str){
         return (double) params.get(str);
@@ -56,7 +84,7 @@ public class Genome {
         params.put(str, newVal);
     }
     public int getNumParams(){
-        return params.size();
+        return 12;
     }
     public HashMap<String, Double> getAllParams(){
         return params;
@@ -79,6 +107,8 @@ public class Genome {
         params.put(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y, g.getDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y)); // 1 to 20 or env height (int)
         params.put(UtilityParams.DECAY_MEMORY_AFTER, g.getDoubleVal(UtilityParams.DECAY_MEMORY_AFTER)); // 1 to 20 or env width (int)
         params.put(UtilityParams.THRESHOLD_EXPLORE, g.getDoubleVal(UtilityParams.THRESHOLD_EXPLORE)); // 1 to 20 or env height (int)
+        params.put(UtilityParams.LENGTH_SNAPS, g.getDoubleVal(UtilityParams.LENGTH_SNAPS));
+        params.put(UtilityParams.UTILITY_STICKY, g.getDoubleVal(UtilityParams.UTILITY_STICKY));
     }
     public static final String getParamStr(int i){
         String paramStr="";
@@ -98,7 +128,7 @@ public class Genome {
             case 12: paramStr=index12; break;
             case 13: paramStr=index13; break;
             case 14: paramStr=index14; break;
-            case 15: paramStr=index15; break;
+            //case 15: paramStr=index15; break;
             default: paramStr=""; break;
         }
         return paramStr;
@@ -110,5 +140,12 @@ public class Genome {
             //System.out.println("WINNER");
             System.out.println(paramStr+" : "+paramVal);
         }
+        //System.out.println(UtilityParams.THRESHOLD_EXPLORE+" : "+getDoubleVal(UtilityParams.THRESHOLD_EXPLORE));
+        System.out.println(UtilityParams.BUFFER_RATIO+" : "+getDoubleVal(UtilityParams.BUFFER_RATIO));
+        System.out.println(UtilityParams.DEVIATION_NEIGHBOUR+" : "+getDoubleVal(UtilityParams.DEVIATION_NEIGHBOUR));
+        //System.out.println(UtilityParams.WEIGHT_COMBINATION+" : "+getDoubleVal(UtilityParams.WEIGHT_COMBINATION));
+        System.out.println(UtilityParams.DECAY_MEMORY_AFTER+" : "+getDoubleVal(UtilityParams.DECAY_MEMORY_AFTER));
+        //System.out.println(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X+" : "+getDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_X));
+        //System.out.println(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y+" : "+getDoubleVal(UtilityParams.NEIGHBOUR_SEARCH_LIMIT_Y));
     }
 }

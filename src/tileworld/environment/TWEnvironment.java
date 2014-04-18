@@ -76,6 +76,7 @@ public class TWEnvironment extends SimState implements Steppable {
     
     public TWEnvironment(long seed) {
         super(seed);
+        //System.out.println("CALLED");
 
         // create object creation distributions (assumed normal for now)
 
@@ -94,10 +95,11 @@ public class TWEnvironment extends SimState implements Steppable {
     }
 
     public TWEnvironment(long seed, ArrayList<HashMap<String,Double>> parameters) {
-        super(seed);
-
+        super(tileworld.Parameters.seed);
+    	//super(9042014);
+        /// CONSTRUCTOR FOR GA
         // create object creation distributions (assumed normal for now)
-
+/*
         this.tileCreator = new TWObjectCreator<TWTile>(Parameters.tileMean, Parameters.tileDev,
                 tiles, this.random, new TWTile(), this);
         this.holeCreator = new TWObjectCreator<TWHole>(Parameters.holeMean, Parameters.holeDev,
@@ -106,6 +108,23 @@ public class TWEnvironment extends SimState implements Steppable {
                 Parameters.obstacleDev, obstacles, this.random, new TWObstacle(), this);
         this.parameters = parameters;
         this.agents = new ArrayList<TWAgent>();
+        tiles = new Bag();
+        holes = new Bag();
+        obstacles = new Bag();*/
+        System.out.println("AGENT");
+        
+        this.tileCreator = new TWObjectCreator<TWTile>(tileworld.Parameters.tileMean, tileworld.Parameters.tileDev,
+                tiles, this.random, new TWTile(), this);
+        this.holeCreator = new TWObjectCreator<TWHole>(tileworld.Parameters.holeMean, tileworld.Parameters.holeDev,
+                holes, this.random, new TWHole(), this);
+        this.obstacleCreator = new TWObjectCreator<TWObstacle>(tileworld.Parameters.obstacleMean,
+        		tileworld.Parameters.obstacleDev, obstacles, this.random, new TWObstacle(), this);
+        this.parameters = new ArrayList<HashMap<String,Double>>();
+        this.parameters.add(parameters.get(0));
+        this.parameters.add(parameters.get(1));
+        //this.parameters.add(UtilityParams.defaultParams());
+        //this.parameters.add(UtilityParams.defaultParams());
+        //System.out.printf("%f, %f, %f, %f, %f, %f\n", parameters.get(0).get(UtilityParams.DEVIATION_TILES), parameters.get(0).get(UtilityParams.DEVIATION_HOLES), parameters.get(0).get(UtilityParams.DEVIATION_MEM_DECAY), parameters.get(0).get(UtilityParams.THRESHOLD_EXPLORE), parameters.get(0).get(UtilityParams.LENGTH_SNAPS), parameters.get(0).get(UtilityParams.UTILITY_STICKY));
         tiles = new Bag();
         holes = new Bag();
         obstacles = new Bag();

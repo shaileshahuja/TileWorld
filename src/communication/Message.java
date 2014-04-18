@@ -2,8 +2,6 @@ package communication;
 import sim.util.Int2D;
 import tileworld.agent.TWAgentPercept;
 
-
-//According to the message requirement, different message objects are created
 public class Message { 
 	private int x;
 	private int y;

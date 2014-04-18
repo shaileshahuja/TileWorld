@@ -36,14 +36,24 @@ private HashMap<String, Double> weightPoints = new HashMap<String, Double>();
         tw.start();
       
         long steps = 0;	
+        //System.out.println(Parameters.endTime);
 
         while (steps < Parameters.endTime) {
-            if (!tw.schedule.step(tw)) {
-                break;
-            }
+        	try{
+        		if (!tw.schedule.step(tw)) {
+                    break;
+                }
+        	}
+        	catch(Exception e){
+        		System.out.println("EXCEPTION!");
+        		return 0;
+        	}
+            steps++;
         }
         tw.finish();
-        return (tw.getScore()*1.0) / tw.getTotalHolesCreated();
+        System.out.println("RUN"+tw.getScore());
+        //return (tw.getScore()*1.0) / tw.getTotalHolesCreated();
+        return (tw.getScore()*1.0);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package communication;
 public class PostBox {
-	//implements messaging chanel between two agents
 	private static Message MessageFromFirst;
 	private static Message MessageFromSecond;
 	public static void put(String fromAgent, Message m){

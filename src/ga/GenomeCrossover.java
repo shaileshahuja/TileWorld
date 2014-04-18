@@ -17,7 +17,7 @@ import ga.Genome;
 public class GenomeCrossover extends AbstractCrossover<Genome>{
     
     public GenomeCrossover(){
-        this(6); // default 6 crossover points
+        this(4); // default 4 crossover points
     }
     
     public GenomeCrossover(int crossoverPoints)

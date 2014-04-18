@@ -80,6 +80,25 @@ public class UtilityParams {
 	public static HashMap<String, Double> defaultParams()
 	{
 		HashMap<String, Double> params = new HashMap<String, Double>();
+		/// DEFAULT
+		/*params.put(BUFFER_RATIO, 0.2);
+		params.put(DEVIATION_TILES, 0.3);
+		params.put(DEVIATION_HOLES, 0.3);
+		params.put(DEVIATION_MEM_DECAY, 15.0);
+		params.put(DEVIATION_NEIGHBOUR, 0.3);
+		params.put(WEIGHT_COMBINATION, 5.0);
+		params.put(PICKUP_ZERO_TILES, 1.0);
+		params.put(PICKUP_ONE_TILES, 0.66);
+		params.put(PICKUP_TWO_TILES, 0.33);
+		params.put(PUTDOWN_ONE_TILE, 0.33);
+		params.put(PUTDOWN_TWO_TILES, 0.66);
+		params.put(PUTDOWN_THREE_TILES, 1.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(DECAY_MEMORY_AFTER, 50.0);
+		params.put(THRESHOLD_EXPLORE, 10.0);
+		params.put(LENGTH_SNAPS, 20.0);
+		params.put(UTILITY_STICKY, 5.0);*/
 		params.put(BUFFER_RATIO, 0.2);
 		params.put(DEVIATION_TILES, 0.3);
 		params.put(DEVIATION_HOLES, 0.3);
@@ -122,6 +141,78 @@ public class UtilityParams {
 		params.put(THRESHOLD_EXPLORE, 10.0);
 		params.put(LENGTH_SNAPS, 20.0);
 		params.put(UTILITY_STICKY, 5.0);
+		return params;
+	}
+	public static HashMap<String, Double> bestParamsEnv1()
+	{
+		/// For sensor = 2, SCORE = 79
+		HashMap<String, Double> params = new HashMap<String, Double>();
+		params.put(BUFFER_RATIO, 0.2);
+		params.put(DEVIATION_TILES, 0.7815); // changed
+		params.put(DEVIATION_HOLES, 0.3);
+		params.put(DEVIATION_MEM_DECAY, 4.0); // changed 
+		params.put(DEVIATION_NEIGHBOUR, 0.3);
+		params.put(WEIGHT_COMBINATION, 5.0);
+		params.put(PICKUP_ZERO_TILES, 1.0);
+		params.put(PICKUP_ONE_TILES, 0.5927 ); // changed
+		params.put(PICKUP_TWO_TILES, 0.3300); // changed
+		params.put(PUTDOWN_ONE_TILE, 0.3300); //changed
+		params.put(PUTDOWN_TWO_TILES, 0.1856); // changed
+		params.put(PUTDOWN_THREE_TILES, 0.6850); //changed
+		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(DECAY_MEMORY_AFTER, 50.0);
+		params.put(THRESHOLD_EXPLORE, 10.0);
+		params.put(LENGTH_SNAPS, 20.0);
+		params.put(UTILITY_STICKY, 5.0);
+		return params;
+	}
+	public static HashMap<String, Double> bestParamsEnv2()
+	{
+		/// For sensor = 2, BEST SCORE: 653
+		HashMap<String, Double> params = new HashMap<String, Double>();
+		params.put(BUFFER_RATIO, 0.2);
+		params.put(DEVIATION_TILES, 0.3);
+		params.put(DEVIATION_HOLES, 0.3282); //changed
+		params.put(DEVIATION_MEM_DECAY, 15.0); 
+		params.put(DEVIATION_NEIGHBOUR, 0.3);
+		params.put(WEIGHT_COMBINATION, 5.0);
+		params.put(PICKUP_ZERO_TILES, 1.0);
+		params.put(PICKUP_ONE_TILES, 0.8829 ); //changed
+		params.put(PICKUP_TWO_TILES, 0.3300); //changed
+		params.put(PUTDOWN_ONE_TILE, 0.3300); // changed
+		params.put(PUTDOWN_TWO_TILES, 0.6600 ); // changed
+		params.put(PUTDOWN_THREE_TILES, 1.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(DECAY_MEMORY_AFTER, 50.0);
+		params.put(THRESHOLD_EXPLORE, 10.0);
+		params.put(LENGTH_SNAPS, 20.0);
+		params.put(UTILITY_STICKY, 5.0);
+		return params;
+	}
+	public static HashMap<String, Double> bestParamsEnv3()
+	{
+		/// For sensor = 2
+		HashMap<String, Double> params = new HashMap<String, Double>();
+		params.put(BUFFER_RATIO, 0.2);
+		params.put(DEVIATION_TILES, 0.7147); // changed
+		params.put(DEVIATION_HOLES, 0.1245); //changed
+		params.put(DEVIATION_MEM_DECAY, 98.0000); // changed
+		params.put(DEVIATION_NEIGHBOUR, 0.3);
+		params.put(WEIGHT_COMBINATION, 5.0);
+		params.put(PICKUP_ZERO_TILES, 1.0);
+		params.put(PICKUP_ONE_TILES, 0.4928); // changed
+		params.put(PICKUP_TWO_TILES, 0.9876); // changed
+		params.put(PUTDOWN_ONE_TILE, 0.6484); // changed
+		params.put(PUTDOWN_TWO_TILES, 0.6600); // changed
+		params.put(PUTDOWN_THREE_TILES, 0.3171); // changed
+		params.put(NEIGHBOUR_SEARCH_LIMIT_X, 3.0);
+		params.put(NEIGHBOUR_SEARCH_LIMIT_Y, 3.0);
+		params.put(DECAY_MEMORY_AFTER, 50.0);
+		params.put(THRESHOLD_EXPLORE, 18.0000); // changed
+		params.put(LENGTH_SNAPS, 71.0000 ); // changed
+		params.put(UTILITY_STICKY, 11.0000); //changed
 		return params;
 	}
 }

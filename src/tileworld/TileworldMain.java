@@ -42,7 +42,7 @@ public class TileworldMain {
             }
             steps = tw.schedule.getSteps();
             if (steps % 500 == 0) {
-                System.out.println("Steps: " + steps + " Time: " + tw.schedule.time());
+                System.out.println("Steps: " + steps + " Time: " + tw.schedule.time()+" Score: "+tw.getScore());
             }
         }
         tw.finish();

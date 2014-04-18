@@ -155,7 +155,7 @@ public class UtilityAgent2 extends TWAgent{
 				intentionChanged = true;
 			}
 		}
-		if(true && DEBUG)
+		if(true )//debug
 		{
 			System.out.print(name + " ");
 			System.out.println(currIntention);
@@ -236,7 +236,7 @@ public class UtilityAgent2 extends TWAgent{
 				loctargety = msgReceived.getY2();
 				//System.out.println("We have received the other's target");
 				if(currIntention != null &&currIntention.getIntentionType() != IntentionType.REFUEL && loctargetx == currIntention.getLocation().getX() && loctargety == currIntention.getLocation().getY()){
-					if(DEBUG)System.out.println("INTENTION CLASH - LOCTARGETX,Y = " + loctargetx + "," + loctargety + "Our intention = " + currIntention.getLocation());
+					if(true)System.out.println("INTENTION CLASH - LOCTARGETX,Y = " + loctargetx + "," + loctargety + "Our intention = " + currIntention.getLocation());
 				}
 			}
 
@@ -364,7 +364,7 @@ public class UtilityAgent2 extends TWAgent{
 			switch(curRequest.charAt(0)){
 			case 'T': respx = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 			if(respx != null)	
-			{	  if(respx.getX() == currIntention.getLocation().getX() && respx.getY() == currIntention.getLocation().getY())
+			{	  if(respx.getX() != currIntention.getLocation().getX() && respx.getY() != currIntention.getLocation().getY())
 				respx = (TWObstacle) this.getMemory().getNearbyObject(this.getX(), this.getY(), 0, TWObstacle.class);
 			if(respx != null)
 				resp = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
@@ -374,7 +374,7 @@ public class UtilityAgent2 extends TWAgent{
 			break;
 			case 'H': respx = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 			if(respx != null){
-				if(respx.getX() == currIntention.getLocation().getX() && respx.getY() == currIntention.getLocation().getY())
+				if(respx.getX() != currIntention.getLocation().getX() && respx.getY() != currIntention.getLocation().getY())
 					respx = (TWObstacle) this.getMemory().getNearbyObject(this.getX(), this.getY(), 0, TWObstacle.class);
 				if(respx != null)
 					resp = this.getMemory().getPerceptAt(respx.getX(), respx.getY());
@@ -383,7 +383,7 @@ public class UtilityAgent2 extends TWAgent{
 			case 'A': tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 			hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 			double tiledistance;
-			if(tile !=null && tile.getX() == currIntention.getLocation().getX() && tile.getY() == currIntention.getLocation().getY())
+			if(tile !=null && tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 			{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 			else tiledistance = 10000000;
 			double holedistance;
@@ -460,13 +460,13 @@ public class UtilityAgent2 extends TWAgent{
 					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 					hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 					double tiledistance;
-					if(tile !=null)
+					if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 					{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 					else tiledistance = 10000000;
 					double holedistance;
-					if(hole != null)
+					if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 					{holedistance = hole.getDistanceTo(locotherx, locothery);}
-					else holedistance = 10000000;
+					else holedistance = 100000;
 					if(tiledistance>=holedistance)
 						respx = hole;
 					else respx = tile; 
@@ -483,13 +483,13 @@ public class UtilityAgent2 extends TWAgent{
 				tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 				hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 				double tiledistance;
-				if(tile !=null)
+				if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 				{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 				else tiledistance = 10000000;
 				double holedistance;
-				if(hole != null)
+				if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 				{holedistance = hole.getDistanceTo(locotherx, locothery);}
-				else holedistance = 10000000;
+				else holedistance = 100000;
 				if(tiledistance>=holedistance)
 					respx = hole;
 				else respx = tile; 
@@ -520,13 +520,13 @@ public class UtilityAgent2 extends TWAgent{
 					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 					hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 					double tiledistance;
-					if(tile !=null)
+					if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 					{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 					else tiledistance = 10000000;
 					double holedistance;
-					if(hole != null)
+					if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 					{holedistance = hole.getDistanceTo(locotherx, locothery);}
-					else holedistance = 10000000;
+					else holedistance = 100000;
 					if(tiledistance>=holedistance)
 						respx = hole;
 					else respx = tile; 
@@ -548,13 +548,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -575,13 +575,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -603,13 +603,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -631,13 +631,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -660,13 +660,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -687,13 +687,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -725,13 +725,13 @@ public class UtilityAgent2 extends TWAgent{
 					tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 					hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 					double tiledistance;
-					if(tile !=null)
+					if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 					{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 					else tiledistance = 10000000;
 					double holedistance;
-					if(hole != null)
+					if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 					{holedistance = hole.getDistanceTo(locotherx, locothery);}
-					else holedistance = 10000000;
+					else holedistance = 100000;
 					if(tiledistance>=holedistance)
 						respx = hole;
 					else respx = tile; 
@@ -754,13 +754,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -781,13 +781,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -809,13 +809,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -836,13 +836,13 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
-						else holedistance = 10000000;
+						else holedistance = 100000;
 						if(tiledistance>=holedistance)
 							respx = hole;
 						else respx = tile; 
@@ -864,11 +864,11 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
 						else holedistance = 10000000;
 						if(tiledistance>=holedistance)
@@ -891,11 +891,11 @@ public class UtilityAgent2 extends TWAgent{
 						tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 						hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 						double tiledistance;
-						if(tile !=null)
+						if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 						{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 						else tiledistance = 10000000;
 						double holedistance;
-						if(hole != null)
+						if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 						{holedistance = hole.getDistanceTo(locotherx, locothery);}
 						else holedistance = 10000000;
 						if(tiledistance>=holedistance)
@@ -911,7 +911,7 @@ public class UtilityAgent2 extends TWAgent{
 		}
 		if(this.currIntention.getIntentionType().equals(IntentionType.REFUEL))
 		{
-			if(DEBUG)
+			if(true)
 				System.out.println("Entering refuel");
 			TWEntity tile;
 			TWEntity hole;
@@ -927,11 +927,11 @@ public class UtilityAgent2 extends TWAgent{
 				tile = this.getMemory().getNearbyTile(locotherx, locothery, 0);
 				hole = this.getMemory().getNearbyHole(locotherx, locothery, 0);
 				double tiledistance;
-				if(tile !=null)
+				if(tile !=null&& tile.getX() != currIntention.getLocation().getX() && tile.getY() != currIntention.getLocation().getY())
 				{tiledistance = tile.getDistanceTo(locotherx, locothery);}
 				else tiledistance = 10000000;
 				double holedistance;
-				if(hole != null)
+				if(hole != null&& hole.getX() != currIntention.getLocation().getX() && hole.getY() != currIntention.getLocation().getY())
 				{holedistance = hole.getDistanceTo(locotherx, locothery);}
 				else holedistance = 10000000;
 				if(tiledistance>=holedistance)
@@ -1179,7 +1179,7 @@ public class UtilityAgent2 extends TWAgent{
 			break;
 		case REFUEL:
 			path = fuelPathGen.generateRefuelPath();
-			if(DEBUG)
+			if(true)
 			{	
 				if(path == null) //test code
 					System.out.print("No path available");
